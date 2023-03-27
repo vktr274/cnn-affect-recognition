@@ -17,6 +17,7 @@ def calculate_class_multiplier(
 
     :param class_df: DataFrame with labels and paths for a single class.
     :param largest_class: Largest class size.
+    :return: Multiplier.
     """
     return largest_class_count / len(class_df)
 
@@ -34,9 +35,13 @@ def balance_class(
     Balance class by augmenting it.
 
     :param df: DataFrame with labels and paths for a single class.
+    :param data_path: Path to data directory.
+    :param subset: Subset name.
     :param ratio: Ratio for class.
+    :param label_col: Name of label column.
     :param filename_col: Name of filename column.
-    :param path_col: Name of path column.
+    :param seed: Random seed.
+    :return: Augmented DataFrame.
     """
     pipeline = A.Compose(
         [
@@ -122,6 +127,7 @@ def split_data(
     Split data into training and test sets and optionally balance classes.
 
     :param df: DataFrame with labels and filenames.
+    :param data_path: Path to data directory.
     :param train_split: Train split ratio.
     :param balance: Whether to balance classes in training and test set.
     :param label_col: Name of label column.
