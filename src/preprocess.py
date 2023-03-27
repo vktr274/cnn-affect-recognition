@@ -9,14 +9,16 @@ import albumentations as A
 import cv2
 
 
-def calculate_class_ratio(class_df: pd.DataFrame, largest_class_count: int) -> float:
+def calculate_class_multiplier(
+    class_df: pd.DataFrame, largest_class_count: int
+) -> float:
     """
-    Calculate ratio with respect to the largest class.
+    Calculate multiplier with respect to the largest class.
 
     :param class_df: DataFrame with labels and paths for a single class.
     :param largest_class: Largest class size.
     """
-    return len(class_df) / largest_class_count
+    return largest_class_count / len(class_df)
 
 
 def balance_class(
@@ -25,7 +27,7 @@ def balance_class(
     subset: str,
     ratio: float,
     label_col: str,
-    path_col: str,
+    filename_col: str,
     seed=None,
 ) -> pd.DataFrame:
     """
@@ -33,7 +35,7 @@ def balance_class(
 
     :param df: DataFrame with labels and paths for a single class.
     :param ratio: Ratio for class.
-    :param label_col: Name of label column.
+    :param filename_col: Name of filename column.
     :param path_col: Name of path column.
     """
     pipeline = A.Compose(
@@ -45,55 +47,65 @@ def balance_class(
             A.Rotate(always_apply=True, limit=20, border_mode=cv2.BORDER_REPLICATE),
         ]
     )
-    augment_count = int(ratio * len(df))
-    new_df = pd.DataFrame(columns=[label_col, path_col])
-    df_sample = df.sample(n=augment_count, random_state=seed)
+    augment_count = int(ratio * len(df)) - len(df)
+    df_sample = df.sample(n=augment_count, random_state=seed, replace=True)
+    row: pd.Series[str]
     for _, row in df_sample.iterrows():
-        path = row[path_col]
+        filename = row[filename_col]
         label = row[label_col]
-        filename = os.path.basename(path)
-        image = cv2.imread(os.path.join(data_path, subset, path))
+        image = cv2.imread(os.path.join(data_path, subset, label, filename))
         augmented = pipeline(image=image)
         augmented_image = augmented["image"]
-        new_path = os.path.join(label, f"augmented_{filename}")
-        new_df = pd.concat(
-            [new_df, {label_col: label, path_col: new_path}], ignore_index=True
+        random_filename = f"aug_{np.random.randint(0, 1_000_000)}{filename}"
+        df = pd.concat(
+            [df, pd.DataFrame({label_col: [label], filename_col: [random_filename]})],
+            ignore_index=True,
         )
-        cv2.imwrite(os.path.join(data_path, subset, new_path), augmented_image)
-    return new_df
+        cv2.imwrite(
+            os.path.join(data_path, subset, label, random_filename), augmented_image
+        )
+    return df
 
 
-def copy_test(df: pd.DataFrame, data_path: str, label_col: str, path_col: str) -> None:
+def copy_test(
+    df: pd.DataFrame, data_path: str, label_col: str, filename_col: str
+) -> None:
     """
     Copy test files to test subdirectory.
 
     :param df: DataFrame with labels and paths.
     :param data_path: Path to data directory.
     :param label_col: Name of label column.
-    :param path_col: Name of path column.
+    :param filename_col: Name of filename column.
     """
     logging.info(f"Copying {len(df)} test files from train to test subdirectory")
+    row: pd.Series[str]
     for _, row in df.iterrows():
-        path = row[path_col]
+        filename = row[filename_col]
         label = row[label_col]
-        train_image_path = os.path.join(data_path, "train", path)
+        train_image_path = os.path.join(data_path, "train", label, filename)
         test_path = os.path.join(data_path, "test", label)
         Path(test_path).mkdir(parents=True, exist_ok=True)
         shutil.copy2(train_image_path, test_path)
 
 
-def delete_copied(df: pd.DataFrame, data_path: str, path_col: str) -> None:
+def delete_copied(
+    df: pd.DataFrame, data_path: str, label_col: str, filename_col: str
+) -> None:
     """
     Delete copied test files from train subdirectory.
 
     :param df: DataFrame with labels and paths.
     :param data_path: Path to data directory.
-    :param path_col: Name of path column.
+    :param label_col: Name of label column.
+    :param filename_col: Name of filename column.
     """
     logging.info(f"Deleting {len(df)} copied test files from train subdirectory")
+    row: pd.Series[str]
     for _, row in df.iterrows():
-        path = row[path_col]
-        train_path = os.path.join(data_path, "train", path)
+        label = row[label_col]
+        filename = row[filename_col]
+        train_path = os.path.join(data_path, "train", label, filename)
         os.remove(train_path)
 
 
@@ -103,17 +115,17 @@ def split_data(
     train_split=0.8,
     balance=False,
     label_col="label",
-    path_col="path",
-    seed=None,
+    filename_col="filename",
+    seed: int | None = None,
 ) -> None:
     """
-    Split data into training and test sets.
+    Split data into training and test sets and optionally balance classes.
 
-    :param df: DataFrame with labels and paths.
+    :param df: DataFrame with labels and filenames.
     :param train_split: Train split ratio.
-    :param balance: Balance classes in training set.
+    :param balance: Whether to balance classes in training and test set.
     :param label_col: Name of label column.
-    :param path_col: Name of path column.
+    :param filename_col: Name of filename column.
     :param seed: Random seed.
     """
     classes = df[label_col].unique()
@@ -121,56 +133,59 @@ def split_data(
 
     counts = df[label_col].value_counts()
     largest_class_size = counts.max()
-    largest_train_class_size = np.ceil(largest_class_size * train_split)
+    largest_train_class_size = int(np.ceil(largest_class_size * train_split))
     logging.info(f"Largest train class size: {largest_train_class_size}")
 
-    train_df = pd.DataFrame(columns=[label_col, path_col])
-    test_df = pd.DataFrame(columns=[label_col, path_col])
+    train_df = pd.DataFrame(columns=[label_col, filename_col])
+    test_df = pd.DataFrame(columns=[label_col, filename_col])
 
+    c: str
     for c in classes:
-        class_paths = df[df[label_col] == c][path_col]
-        train_paths = class_paths.sample(frac=train_split, random_state=seed)
-        test_paths = class_paths.drop(train_paths.index)
+        df_c = df[df[label_col] == c]
+        train_class_df = df_c.sample(frac=train_split, random_state=seed)
+        test_class_df = df_c.drop(train_class_df.index).astype(str)
 
-        logging.info(f"Class {c}: {len(train_paths)} train samples")
-        logging.info(f"Class {c}: {len(test_paths)} test samples")
+        logging.info(f"Class {c}: {len(train_class_df)} train samples")
+        logging.info(f"Class {c}: {len(test_class_df)} test samples")
 
-        train_class_df = pd.DataFrame({path_col: train_paths, label_col: c})
-        test_class_df = pd.DataFrame({path_col: test_paths, label_col: c})
-        copy_test(test_class_df, data_path, label_col, path_col)
-        delete_copied(test_class_df, data_path, path_col)
+        copy_test(test_class_df, data_path, label_col, filename_col)
+        delete_copied(test_class_df, data_path, label_col, filename_col)
 
         if balance:
-            ratio_train = calculate_class_ratio(
+            multiplier_train = calculate_class_multiplier(
                 train_class_df, largest_train_class_size
             )
-            ratio_test = calculate_class_ratio(
+            multiplier_test = calculate_class_multiplier(
                 test_class_df, largest_class_size - largest_train_class_size
             )
-            logging.info(f"Class {c}: ratio_train = {ratio_train}")
-            logging.info(f"Class {c}: ratio_test = {ratio_test}")
-            if ratio_train < 1:
+            logging.info(f"Class {c}: multiplier_train = {multiplier_train}")
+            logging.info(f"Class {c}: multiplier_test = {multiplier_test}")
+            if multiplier_train > 1:
                 train_class_df = balance_class(
                     train_class_df,
                     data_path,
                     "train",
-                    ratio_train,
+                    multiplier_train,
                     label_col,
-                    path_col,
+                    filename_col,
                     seed,
                 )
-            if ratio_test < 1:
+                logging.info(
+                    f"Class {c}: augmented to {len(train_class_df)} train samples"
+                )
+            if multiplier_test > 1:
                 test_class_df = balance_class(
                     test_class_df,
                     data_path,
                     "test",
-                    ratio_test,
+                    multiplier_test,
                     label_col,
-                    path_col,
+                    filename_col,
                     seed,
                 )
-            logging.info(f"Class {c}: augmented to {len(train_class_df)} train samples")
-            logging.info(f"Class {c}: augmented to {len(test_class_df)} test samples")
+                logging.info(
+                    f"Class {c}: augmented to {len(test_class_df)} test samples"
+                )
         train_df = pd.concat([train_df, train_class_df], ignore_index=True)
         test_df = pd.concat([test_df, test_class_df], ignore_index=True)
 
@@ -178,6 +193,26 @@ def split_data(
     logging.info(f"Total: {len(test_df)} test samples")
     train_df.to_csv(os.path.join(data_path, "train.csv"), index=False)
     test_df.to_csv(os.path.join(data_path, "test.csv"), index=False)
+
+
+def load_dataframe(train_path: str, label_col: str, filename_col: str) -> pd.DataFrame:
+    """
+    Load DataFrame with labels and filenames.
+
+    :param train_path: Path to train subdirectory.
+    :param label_col: Name of label column.
+    :param filename_col: Name of filename column.
+    :return: DataFrame with labels and filenames.
+    """
+    df = pd.DataFrame(columns=[label_col, filename_col])
+    for label in os.listdir(train_path):
+        label_path = os.path.join(train_path, label)
+        for filename in os.listdir(label_path):
+            df = pd.concat(
+                [df, pd.DataFrame({label_col: [label], filename_col: [filename]})],
+                ignore_index=True,
+            )
+    return df
 
 
 if __name__ == "__main__":
@@ -194,30 +229,12 @@ if __name__ == "__main__":
         help="Balance classes in training set (default: False)",
     )
     parser.add_argument(
-        "--csv-name",
-        type=str,
-        default="labels",
-        help="Name of csv file (default: labels)",
-    )
-    parser.add_argument(
-        "--label-col",
-        type=str,
-        default="label",
-        help="Name of label column (default: label)",
-    )
-    parser.add_argument(
-        "--path-col",
-        type=str,
-        default="path",
-        help="Name of path column (default: path)",
+        "--seed", type=int, default=None, help="Random seed (default: None)"
     )
     parser.add_argument(
         "path",
         type=str,
-        help="Path to a directory with train subdirectory and labels.csv file.",
-    )
-    parser.add_argument(
-        "--seed", type=int, default=None, help="Random seed (default: None)"
+        help="Path to a directory with train subdirectory.",
     )
     args = parser.parse_args()
 
@@ -230,17 +247,17 @@ if __name__ == "__main__":
     if not os.path.exists(train_path):
         logging.error(f"Path {args.path} does not include train subdirectory.")
 
-    labels_path = os.path.join(args.path, args.csv_name + ".csv")
-    if not os.path.exists(labels_path):
-        logging.error(f"Path {args.path} does not include labels.csv file.")
+    label_col = "label"
+    filename_col = "filename"
 
-    df = pd.read_csv(labels_path)
+    df = load_dataframe(train_path, label_col, filename_col)
+
     split_data(
         df=df,
         data_path=args.path,
         train_split=args.train_split,
         balance=args.balance,
-        label_col=args.label_col,
-        path_col=args.path_col,
+        label_col=label_col,
+        filename_col=filename_col,
         seed=args.seed,
     )
