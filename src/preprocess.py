@@ -10,7 +10,9 @@ import cv2
 
 
 def calculate_class_multiplier(
-    class_df: pd.DataFrame, largest_class_count: int
+    class_df: pd.DataFrame,
+    largest_class_count: int,
+    global_multiplier=1.0,
 ) -> float:
     """
     Calculate multiplier with respect to the largest class.
@@ -19,7 +21,7 @@ def calculate_class_multiplier(
     :param largest_class: Largest class size.
     :return: Multiplier.
     """
-    return largest_class_count / len(class_df)
+    return global_multiplier * largest_class_count / len(class_df)
 
 
 def balance_class(
@@ -29,7 +31,7 @@ def balance_class(
     ratio: float,
     label_col: str,
     filename_col: str,
-    seed=None,
+    seed: int | None = None,
 ) -> pd.DataFrame:
     """
     Balance class by augmenting it.
@@ -60,7 +62,7 @@ def balance_class(
             A.Rotate(always_apply=True, limit=20, border_mode=cv2.BORDER_REPLICATE),
         ]
     )
-    augment_count = int(ratio * len(df)) - len(df)
+    augment_count = int(np.ceil(ratio * len(df))) - len(df)
     df_sample = df.sample(n=augment_count, random_state=seed, replace=True)
     row: pd.Series[str]
     for _, row in df_sample.iterrows():
@@ -91,7 +93,6 @@ def copy_test(
     :param label_col: Name of label column.
     :param filename_col: Name of filename column.
     """
-    logging.info(f"Copying {len(df)} test files from train to test subdirectory")
     row: pd.Series[str]
     for _, row in df.iterrows():
         filename = row[filename_col]
@@ -113,7 +114,6 @@ def delete_copied(
     :param label_col: Name of label column.
     :param filename_col: Name of filename column.
     """
-    logging.info(f"Deleting {len(df)} copied test files from train subdirectory")
     row: pd.Series[str]
     for _, row in df.iterrows():
         label = row[label_col]
@@ -129,6 +129,7 @@ def split_data(
     balance=False,
     label_col="label",
     filename_col="filename",
+    global_multiplier=1.0,
     seed: int | None = None,
 ) -> None:
     """
@@ -140,10 +141,12 @@ def split_data(
     :param balance: Whether to balance classes in training and test set.
     :param label_col: Name of label column.
     :param filename_col: Name of filename column.
+    :param global_multiplier: Global multiplier for class size.
     :param seed: Random seed.
     """
     classes = df[label_col].unique()
     logging.info(f"Classes: {classes}")
+    logging.info(f"Global multiplier: {global_multiplier}")
 
     counts = df[label_col].value_counts()
     largest_class_size = counts.max()
@@ -162,15 +165,23 @@ def split_data(
         logging.info(f"Class {c}: {len(train_class_df)} train samples")
         logging.info(f"Class {c}: {len(test_class_df)} test samples")
 
+        logging.info(
+            f"Copying {len(test_class_df)} test files from train to test subdirectory"
+        )
         copy_test(test_class_df, data_path, label_col, filename_col)
+        logging.info(
+            f"Deleting {len(test_class_df)} copied test files from train subdirectory"
+        )
         delete_copied(test_class_df, data_path, label_col, filename_col)
 
         if balance:
             multiplier_train = calculate_class_multiplier(
-                train_class_df, largest_train_class_size
+                train_class_df, largest_train_class_size, global_multiplier
             )
             multiplier_test = calculate_class_multiplier(
-                test_class_df, largest_class_size - largest_train_class_size
+                test_class_df,
+                largest_class_size - largest_train_class_size,
+                global_multiplier,
             )
             logging.info(f"Class {c}: multiplier_train = {multiplier_train}")
             logging.info(f"Class {c}: multiplier_test = {multiplier_test}")
@@ -233,7 +244,11 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Split data into training and test sets.")
     parser.add_argument(
         "--train-split",
-        type=float,
+        type=lambda x: float(x)
+        if float(x) > 0.5
+        else parser.error(
+            "Train split ratio must be a floating point number larger than 0.5"
+        ),
         default=0.8,
         help="Train split ratio (default: 0.8)",
     )
@@ -243,12 +258,39 @@ if __name__ == "__main__":
         help="Balance classes in training set (default: False)",
     )
     parser.add_argument(
-        "--seed", type=int, default=None, help="Random seed (default: None)"
+        "--seed",
+        type=lambda x: int(x)
+        if int(x) > 0
+        else parser.error("Seed must be an integer greater than 0"),
+        default=None,
+        help="Random seed (default: None)",
     )
     parser.add_argument(
         "path",
         type=str,
         help="Path to a directory with train subdirectory.",
+    )
+    parser.add_argument(
+        "--label-col",
+        type=str,
+        default="label",
+        help="Name of label column you want to be created in the CSV files (default: label)",
+    )
+    parser.add_argument(
+        "--filename-col",
+        type=str,
+        default="filename",
+        help="Name of filename column you want to be created in the CSV files (default: filename)",
+    )
+    parser.add_argument(
+        "--global-multiplier",
+        type=lambda x: float(x)
+        if float(x) > 1.0
+        else parser.error(
+            "Multiplier must be a floating point number greater than 1.0"
+        ),
+        default=1.0,
+        help="Global multiplier for all classes (default: 1.0)",
     )
     args = parser.parse_args()
 
@@ -261,17 +303,16 @@ if __name__ == "__main__":
     if not os.path.exists(train_path):
         logging.error(f"Path {args.path} does not include train subdirectory.")
 
-    label_col = "label"
-    filename_col = "filename"
-
-    df = load_dataframe(train_path, label_col, filename_col)
+    logging.info(f"Creating DataFrame of labels and filenames from {train_path}")
+    df = load_dataframe(train_path, args.label_col, args.filename_col)
 
     split_data(
         df=df,
         data_path=args.path,
         train_split=args.train_split,
         balance=args.balance,
-        label_col=label_col,
-        filename_col=filename_col,
+        label_col=args.label_col,
+        filename_col=args.filename_col,
+        global_multiplier=args.global_multiplier,
         seed=args.seed,
     )
