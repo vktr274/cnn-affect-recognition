@@ -185,7 +185,7 @@ def split_data(
             )
             logging.info(f"Class {c}: multiplier_train = {multiplier_train}")
             logging.info(f"Class {c}: multiplier_test = {multiplier_test}")
-            if multiplier_train > 1:
+            if multiplier_train > 1.0:
                 train_class_df = balance_class(
                     train_class_df,
                     data_path,
@@ -198,7 +198,7 @@ def split_data(
                 logging.info(
                     f"Class {c}: augmented to {len(train_class_df)} train samples"
                 )
-            if multiplier_test > 1:
+            if multiplier_test > 1.0:
                 test_class_df = balance_class(
                     test_class_df,
                     data_path,
@@ -241,13 +241,15 @@ def load_dataframe(train_path: str, label_col: str, filename_col: str) -> pd.Dat
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description="Split data into training and test sets.")
+    parser = ArgumentParser(
+        description="Split data into training and test sets and optinally augment or balance classes."
+    )
     parser.add_argument(
         "--train-split",
         type=lambda x: float(x)
         if float(x) > 0.5
         else parser.error(
-            "Train split ratio must be a floating point number larger than 0.5"
+            "Train split ratio must be a floating point number greater than 0.5"
         ),
         default=0.8,
         help="Train split ratio (default: 0.8)",
@@ -285,9 +287,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--global-multiplier",
         type=lambda x: float(x)
-        if float(x) > 1.0
+        if float(x) >= 1.0
         else parser.error(
-            "Multiplier must be a floating point number greater than 1.0"
+            "Multiplier must be a floating point number greater than or equal to 1.0"
         ),
         default=1.0,
         help="Global multiplier for all classes (default: 1.0)",
