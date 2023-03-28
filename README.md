@@ -34,8 +34,8 @@ Options:
 - `-h` - show help message and exit
 - `--train-split TRAIN_SPLIT` - Train split ratio (default: `0.8`)
 - `--seed SEED` - Random seed (default: `None`)
-- `--label-col LABEL_COL` - Label column name (default: `label`)
-- `--filename-col FILENAME_COL` - Filename column name (default: `filename`)
+- `--label-col LABEL_COL` - Label column name (default: `'label'`)
+- `--filename-col FILENAME_COL` - Filename column name (default: `'filename'`)
 - `--global-multiplier GLOBAL_MULTIPLIER` - Global multiplier for the number of images in each class (default: `1.0`). This option can be used to increase the number of images in each class but is ignored if `--balance` is not used.
 - `--balance` - Balance classes in training set and optionally perform global augmentation if `GLOBAL_MULTIPLIER` is greater than 1.0 (default: `False`)
 
