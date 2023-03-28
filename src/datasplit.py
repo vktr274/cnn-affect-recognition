@@ -11,17 +11,18 @@ import cv2
 
 def calculate_class_multiplier(
     class_df: pd.DataFrame,
-    largest_class_count: int,
+    largest_class_size: int,
     global_multiplier=1.0,
 ) -> float:
     """
     Calculate multiplier with respect to the largest class.
 
     :param class_df: DataFrame with labels and paths for a single class.
-    :param largest_class: Largest class size.
+    :param largest_class_size: Largest class size.
+    :param global_multiplier: Global multiplier for every class.
     :return: Multiplier.
     """
-    return global_multiplier * largest_class_count / len(class_df)
+    return global_multiplier * largest_class_size / len(class_df)
 
 
 def balance_class(
@@ -134,6 +135,10 @@ def split_data(
 ) -> None:
     """
     Split data into training and test sets and optionally balance classes.
+    If balance is True and global_multiplier is greater than 1.0, then in
+    addition to balancing classes, the training set will be globally augmented.
+    If balance is True and global_multiplier is equal to 1.0, then only class
+    balancing will be performed.
 
     :param df: DataFrame with labels and filenames.
     :param data_path: Path to data directory.
@@ -146,12 +151,14 @@ def split_data(
     """
     classes = df[label_col].unique()
     logging.info(f"Classes: {classes}")
-    logging.info(f"Global multiplier: {global_multiplier}")
 
     counts = df[label_col].value_counts()
     largest_class_size = counts.max()
     largest_train_class_size = int(np.ceil(largest_class_size * train_split))
-    logging.info(f"Largest train class size: {largest_train_class_size}")
+
+    if balance:
+        logging.info(f"Global multiplier: {global_multiplier}")
+        logging.info(f"Largest train class size: {largest_train_class_size}")
 
     train_df = pd.DataFrame(columns=[label_col, filename_col])
     test_df = pd.DataFrame(columns=[label_col, filename_col])
@@ -242,7 +249,7 @@ def load_dataframe(train_path: str, label_col: str, filename_col: str) -> pd.Dat
 
 if __name__ == "__main__":
     parser = ArgumentParser(
-        description="Split data into training and test sets and optinally augment or balance classes."
+        description="Split data into training and test sets and optionally balance and augment classes."
     )
     parser.add_argument(
         "--train-split",
@@ -257,7 +264,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--balance",
         action="store_true",
-        help="Balance classes in training set (default: False)",
+        help="Balance classes in training set and optionally perform global augmentation if GLOBAL_MULTIPLIER is set to greater than 1.0 (default: False)",
     )
     parser.add_argument(
         "--seed",
@@ -276,13 +283,13 @@ if __name__ == "__main__":
         "--label-col",
         type=str,
         default="label",
-        help="Name of label column you want to be created in the CSV files (default: label)",
+        help="Name of label column you want to be created in the CSV files (default: 'label')",
     )
     parser.add_argument(
         "--filename-col",
         type=str,
         default="filename",
-        help="Name of filename column you want to be created in the CSV files (default: filename)",
+        help="Name of filename column you want to be created in the CSV files (default: 'filename')",
     )
     parser.add_argument(
         "--global-multiplier",
@@ -292,7 +299,7 @@ if __name__ == "__main__":
             "Multiplier must be a floating point number greater than or equal to 1.0"
         ),
         default=1.0,
-        help="Global multiplier for all classes (default: 1.0)",
+        help="Global multiplier for the number of images in each class (default: 1.0). This option can be used to increase the number of images in each class but is ignored if --balance is not used.",
     )
     args = parser.parse_args()
 
