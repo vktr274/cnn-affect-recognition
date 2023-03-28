@@ -152,11 +152,13 @@ def split_data(
     classes = df[label_col].unique()
     logging.info(f"Classes: {classes}")
 
-    counts = df[label_col].value_counts()
-    largest_class_size = counts.max()
-    largest_train_class_size = int(np.ceil(largest_class_size * train_split))
+    largest_class_size = 0
+    largest_train_class_size = 0
 
     if balance:
+        counts = df[label_col].value_counts()
+        largest_class_size = counts.max()
+        largest_train_class_size = int(np.ceil(largest_class_size * train_split))
         logging.info(f"Global multiplier: {global_multiplier}")
         logging.info(f"Largest train class size: {largest_train_class_size}")
 
