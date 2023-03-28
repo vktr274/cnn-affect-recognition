@@ -1,3 +1,4 @@
+from typing import Union
 import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
@@ -32,7 +33,7 @@ def balance_class(
     ratio: float,
     label_col: str,
     filename_col: str,
-    seed: int | None = None,
+    seed: Union[int, None] = None,
 ) -> pd.DataFrame:
     """
     Balance class by augmenting it.
@@ -131,7 +132,7 @@ def split_data(
     label_col="label",
     filename_col="filename",
     global_multiplier=1.0,
-    seed: int | None = None,
+    seed: Union[int, None] = None,
 ) -> None:
     """
     Split data into training and test sets and optionally balance classes.
