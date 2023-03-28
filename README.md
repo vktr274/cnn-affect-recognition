@@ -11,7 +11,7 @@ We used the [Facial Expressions Training Data](https://www.kaggle.com/datasets/n
 
 We created a Python script that splits the dataset into training and test sets and optionally balances the dataset. The script also creates a CSV file with label to filename mappings. The script is located in the `src` folder and is named `datasplit.py`. The script is universal and can be used for any dataset that has the same structure (dataset with a train subdirectory with images in subdirectories named after the labels).
 
-Before running the script, the dataset should be downloaded and extracted to a trein subdirectory of a arbitrary otherwise empty folder. The script will create a `data/test` subdirectory and will move the images to the appropriate subdirectories. The script will also create a `data/train.csv` and `data/test.csv` files with label to filename mappings.
+Before running the script, the dataset should be downloaded and extracted to a train subdirectory of an arbitrary otherwise empty folder. The script will create a `test` subdirectory in the folder and will move the images to the appropriate subdirectories. The script will also create a `train.csv` and `test.csv` files in the folder. The `train.csv` file will contain the label to filename mappings for the training set and the `test.csv` file will contain the label to filename mappings for the test set.
 
 Besides the dataset, the script requires installation of required Python packages listed in the `requirements.txt` file. The packages can be installed using the following command:
 
