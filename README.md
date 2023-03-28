@@ -5,7 +5,7 @@ Authors: Viktor Modroczký & Michaela Hanková
 
 ## Dataset
 
-We used the [Facial Expressions Training Data](https://www.kaggle.com/datasets/noamsegal/affectnet-training-data) from Kaggle. The dataset contains 29,042 images of 8 different emotions. The images are 96x96 pixels and are grayscale.
+We used the [Facial Expressions Training Data](https://www.kaggle.com/datasets/noamsegal/affectnet-training-data) from Kaggle. The dataset contains 29,042 images of 8 different classes of emotions which are not balanced - anger, contempt, disgust, fear, happy, neutral, sad, and surprise. The images are 96x96 pixels and have 3 channels (RGB).
 
 ## Preprocessing
 
