@@ -175,11 +175,11 @@ def split_data(
         logging.info(f"Class {c}: {len(test_class_df)} test samples")
 
         logging.info(
-            f"Copying {len(test_class_df)} test files from train to test subdirectory"
+            f"Class {c}: copying {len(test_class_df)} test files from train to test subdirectory"
         )
         copy_test(test_class_df, data_path, label_col, filename_col)
         logging.info(
-            f"Deleting {len(test_class_df)} copied test files from train subdirectory"
+            f"Class {c}: deleting {len(test_class_df)} copied test files from train subdirectory"
         )
         delete_copied(test_class_df, data_path, label_col, filename_col)
 
