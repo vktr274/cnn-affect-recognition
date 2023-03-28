@@ -305,7 +305,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     if not os.path.exists(args.path):
         logging.error(f"Path {args.path} does not exist.")
