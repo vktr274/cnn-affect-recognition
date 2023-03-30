@@ -23,7 +23,7 @@ The script is universal and can be used for any dataset that has the same struct
 
 Usage:
 
-`datasplit.py [-h] [--train-split TRAIN_SPLIT] [--seed SEED] [--label-col LABEL_COL] [--filename-col FILENAME_COL] [--global-multiplier GLOBAL_MULTIPLIER] [--output OUTPUT] [--balance] path`
+`datasplit.py [-h] [--balance] [--output-path OUTPUT_PATH] [--train-split TRAIN_SPLIT] [--seed SEED] [--label-col LABEL_COL] [--filename-col FILENAME_COL] [--global-multiplier GLOBAL_MULTIPLIER] [--pipeline-yaml PIPELINE_YAML] path`
 
 Positional argument:
 
@@ -31,14 +31,19 @@ Positional argument:
 
 Options:
 
-- `-h` - show help message and exit
+- `-h`, `--help` - show help message and exit
+- `--balance` - Balance classes in training set and optionally perform global augmentation if `GLOBAL_MULTIPLIER` is greater than 1.0 (default: `False`)
 - `--output OUTPUT` - Path to an empty output directory (default: `None` - overwrite input directory)
 - `--train-split TRAIN_SPLIT` - Train split ratio (default: `0.8`)
 - `--seed SEED` - Random seed (default: `None`)
 - `--label-col LABEL_COL` - Label column name (default: `'label'`)
 - `--filename-col FILENAME_COL` - Filename column name (default: `'filename'`)
 - `--global-multiplier GLOBAL_MULTIPLIER` - Global multiplier for the number of images in each class (default: `1.0`). This option can be used to increase the number of images in each class but is ignored if `--balance` is not used.
-- `--balance` - Balance classes in training set and optionally perform global augmentation if `GLOBAL_MULTIPLIER` is greater than 1.0 (default: `False`)
+- `--pipeline-yaml` - Path to a custom Albumentations Compose pipeline serialized to YAML (default: `None` - use pipeline included in this script)
+
+A custom Albumentations Compose pipeline can be serialized using [`albumentations.core.serialization.save`](https://albumentations.ai/docs/api_reference/core/serialization/#albumentations.core.serialization.save). The pipeline should be serialized to YAML and has to be an instance of [`albumentations.core.composition.Compose`](https://albumentations.ai/docs/api_reference/core/composition/#albumentations.core.composition.Compose).
+
+Example of serializing a custom pipeline is included in the `src` folder and is named `custom_pipeline_example.py`. Example of a serialized pipeline is included in the root folder and is named `custom_pipeline_example.yaml`.
 
 ## Model
 

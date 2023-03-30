@@ -1,5 +1,5 @@
-from importlib import import_module
-from typing import Union, cast
+import sys
+from typing import Union
 import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
@@ -7,7 +7,6 @@ import logging
 import os
 import shutil
 from distutils.dir_util import copy_tree
-from importlib.util import find_spec, module_from_spec
 from pathlib import Path
 import albumentations as A
 import cv2
@@ -269,6 +268,11 @@ def create_cli() -> ArgumentParser:
         help="Path to a directory that includes a train directory with the images in subdirectories named after the labels",
     )
     parser.add_argument(
+        "--balance",
+        action="store_true",
+        help="Balance classes in training set and optionally perform global augmentation if GLOBAL_MULTIPLIER is set to greater than 1.0 (default: False)",
+    )
+    parser.add_argument(
         "--output-path",
         type=str,
         default=None,
@@ -283,11 +287,6 @@ def create_cli() -> ArgumentParser:
         ),
         default=0.8,
         help="Train split ratio (default: 0.8)",
-    )
-    parser.add_argument(
-        "--balance",
-        action="store_true",
-        help="Balance classes in training set and optionally perform global augmentation if GLOBAL_MULTIPLIER is set to greater than 1.0 (default: False)",
     )
     parser.add_argument(
         "--seed",
@@ -319,6 +318,12 @@ def create_cli() -> ArgumentParser:
         default=1.0,
         help="Global multiplier for the number of images in each class (default: 1.0). This option can be used to increase the number of images in each class but is ignored if --balance is not used.",
     )
+    parser.add_argument(
+        "--pipeline-yaml",
+        type=str,
+        default=None,
+        help="Path to a custom Albumentations Compose pipeline serialized to YAML (default: None - use pipeline included in this script)",
+    )
     return parser
 
 
@@ -333,10 +338,23 @@ def copy_to_output(from_path: str, to_path: str) -> None:
     copy_tree(from_path, to_path)
 
 
-def get_pipeline() -> A.Compose:
+def get_pipeline(yaml_path: Union[str, None] = None) -> A.Compose:
     """
     Get pipeline for augmentation.
     """
+    if yaml_path is not None:
+        if not os.path.exists(yaml_path):
+            logging.error(f"Custom pipeline YAML file {yaml_path} does not exist")
+            sys.exit(1)
+        logging.info(f"Loading custom pipeline from {yaml_path}")
+        loaded = A.load(yaml_path, data_format="yaml")
+        if not isinstance(loaded, A.Compose):
+            logging.error(
+                f"Pipeline loaded from {yaml_path} is not an instance of {A.Compose.__module__}.{A.Compose.__name__}"
+            )
+            sys.exit(1)
+        return loaded
+
     return A.Compose(
         [
             A.HorizontalFlip(p=0.5),
@@ -365,12 +383,14 @@ if __name__ == "__main__":
     path = args.path
     if not os.path.exists(path):
         logging.error(f"Path {path} does not exist.")
+        sys.exit(1)
 
     train_path = os.path.join(path, "train")
     if not os.path.exists(train_path):
         logging.error(f"Path {path} does not include train subdirectory.")
+        sys.exit(1)
 
-    pipeline = get_pipeline()
+    pipeline = get_pipeline(args.pipeline_yaml)
 
     if args.output_path is not None:
         old_train_path = train_path
