@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 import logging
 import os
 import shutil
+from distutils.dir_util import copy_tree
 from pathlib import Path
 import albumentations as A
 import cv2
@@ -250,9 +251,25 @@ def load_dataframe(train_path: str, label_col: str, filename_col: str) -> pd.Dat
     return df
 
 
-if __name__ == "__main__":
+def create_cli() -> ArgumentParser:
+    """
+    Create CLI.
+
+    :return: ArgumentParser.
+    """
     parser = ArgumentParser(
         description="Split data into training and test sets and optionally balance and augment classes."
+    )
+    parser.add_argument(
+        "path",
+        type=str,
+        help="Path to a directory with train subdirectory.",
+    )
+    parser.add_argument(
+        "--output-path",
+        type=str,
+        default=None,
+        help="Path to an output directory (default: None - overwrite input directory)",
     )
     parser.add_argument(
         "--train-split",
@@ -278,11 +295,6 @@ if __name__ == "__main__":
         help="Random seed (default: None)",
     )
     parser.add_argument(
-        "path",
-        type=str,
-        help="Path to a directory with train subdirectory.",
-    )
-    parser.add_argument(
         "--label-col",
         type=str,
         default="label",
@@ -304,23 +316,47 @@ if __name__ == "__main__":
         default=1.0,
         help="Global multiplier for the number of images in each class (default: 1.0). This option can be used to increase the number of images in each class but is ignored if --balance is not used.",
     )
-    args = parser.parse_args()
+    return parser
+
+
+def copy_to_output(from_path: str, to_path: str) -> None:
+    """
+    Copy files from one directory to another.
+
+    :param from_path: Path to a directory with files.
+    :param to_path: Path to a directory where files will be copied.
+    """
+    copy_tree(from_path, to_path)
+
+
+if __name__ == "__main__":
+    cli = create_cli()
+    args = cli.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-    if not os.path.exists(args.path):
-        logging.error(f"Path {args.path} does not exist.")
+    path = args.path
+    if not os.path.exists(path):
+        logging.error(f"Path {path} does not exist.")
 
-    train_path = os.path.join(args.path, "train")
+    train_path = os.path.join(path, "train")
     if not os.path.exists(train_path):
-        logging.error(f"Path {args.path} does not include train subdirectory.")
+        logging.error(f"Path {path} does not include train subdirectory.")
+
+    if args.output_path is not None:
+        old_train_path = train_path
+        path = args.output_path
+        train_path = os.path.join(args.output_path, "train")
+        Path(train_path).mkdir(parents=True, exist_ok=True)
+        logging.info(f"Copying files from {old_train_path} to {train_path}")
+        copy_to_output(old_train_path, train_path)
 
     logging.info(f"Creating DataFrame of labels and filenames from {train_path}")
     df = load_dataframe(train_path, args.label_col, args.filename_col)
 
     split_data(
         df=df,
-        data_path=args.path,
+        data_path=path,
         train_split=args.train_split,
         balance=args.balance,
         label_col=args.label_col,

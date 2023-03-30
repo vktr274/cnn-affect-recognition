@@ -23,7 +23,7 @@ The script is universal and can be used for any dataset that has the same struct
 
 Usage:
 
-`datasplit.py [-h] [--train-split TRAIN_SPLIT] [--seed SEED] [--label-col LABEL_COL] [--filename-col FILENAME_COL] [--global-multiplier GLOBAL_MULTIPLIER] [--balance]`
+`datasplit.py [-h] [--train-split TRAIN_SPLIT] [--seed SEED] [--label-col LABEL_COL] [--filename-col FILENAME_COL] [--global-multiplier GLOBAL_MULTIPLIER] [--output OUTPUT] [--balance] path`
 
 Positional argument:
 
@@ -32,6 +32,7 @@ Positional argument:
 Options:
 
 - `-h` - show help message and exit
+- `--output OUTPUT` - Output directory (default: `None` - overwrite the input directory)
 - `--train-split TRAIN_SPLIT` - Train split ratio (default: `0.8`)
 - `--seed SEED` - Random seed (default: `None`)
 - `--label-col LABEL_COL` - Label column name (default: `'label'`)

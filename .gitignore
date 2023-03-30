@@ -1,2 +1,2 @@
-data
-data_backup
+data*
+__pycache__
