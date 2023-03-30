@@ -255,6 +255,56 @@ def load_dataframe(train_path: str, label_col: str, filename_col: str) -> pd.Dat
     return df
 
 
+def copy_to_output(from_path: str, to_path: str) -> None:
+    """
+    Copy files from one directory to another.
+
+    :param from_path: Path to a directory with files.
+    :param to_path: Path to a directory where files will be copied.
+    """
+    logging.info(f"Copying files from {from_path} to {to_path}")
+    copy_tree(from_path, to_path)
+
+
+def get_pipeline(yaml_path: Union[str, None] = None) -> A.Compose:
+    """
+    Get pipeline for augmentation.
+
+    :param yaml_path: Path to a custom pipeline serialized to YAML. Can be None to use the default pipeline.
+    :return: Albumentations Compose pipeline.
+    """
+    if yaml_path is not None:
+        if not os.path.exists(yaml_path):
+            logging.error(f"Custom pipeline YAML file {yaml_path} does not exist")
+            sys.exit(1)
+        logging.info(f"Loading custom pipeline from {yaml_path}")
+        loaded = A.load(yaml_path, data_format="yaml")
+        if not isinstance(loaded, A.Compose):
+            logging.error(
+                f"Pipeline loaded from {yaml_path} is not an instance of {A.Compose.__module__}.{A.Compose.__name__}"
+            )
+            sys.exit(1)
+        return loaded
+
+    return A.Compose(
+        [
+            A.HorizontalFlip(p=0.5),
+            A.RandomBrightnessContrast(
+                always_apply=True, contrast_limit=0.2, brightness_limit=0.2
+            ),
+            A.OneOf(
+                [
+                    A.MotionBlur(always_apply=True),
+                    A.GaussNoise(always_apply=True),
+                    A.GaussianBlur(always_apply=True),
+                ],
+                p=0.5,
+            ),
+            A.Rotate(always_apply=True, limit=20, border_mode=cv2.BORDER_REPLICATE),
+        ]
+    )
+
+
 def create_cli() -> ArgumentParser:
     """
     Create CLI.
@@ -327,56 +377,6 @@ def create_cli() -> ArgumentParser:
         help="Path to a custom Albumentations Compose pipeline serialized to YAML (default: None - use pipeline included in this script)",
     )
     return parser
-
-
-def copy_to_output(from_path: str, to_path: str) -> None:
-    """
-    Copy files from one directory to another.
-
-    :param from_path: Path to a directory with files.
-    :param to_path: Path to a directory where files will be copied.
-    """
-    logging.info(f"Copying files from {from_path} to {to_path}")
-    copy_tree(from_path, to_path)
-
-
-def get_pipeline(yaml_path: Union[str, None] = None) -> A.Compose:
-    """
-    Get pipeline for augmentation.
-
-    :param yaml_path: Path to a custom pipeline serialized to YAML. Can be None to use the default pipeline.
-    :return: Albumentations Compose pipeline.
-    """
-    if yaml_path is not None:
-        if not os.path.exists(yaml_path):
-            logging.error(f"Custom pipeline YAML file {yaml_path} does not exist")
-            sys.exit(1)
-        logging.info(f"Loading custom pipeline from {yaml_path}")
-        loaded = A.load(yaml_path, data_format="yaml")
-        if not isinstance(loaded, A.Compose):
-            logging.error(
-                f"Pipeline loaded from {yaml_path} is not an instance of {A.Compose.__module__}.{A.Compose.__name__}"
-            )
-            sys.exit(1)
-        return loaded
-
-    return A.Compose(
-        [
-            A.HorizontalFlip(p=0.5),
-            A.RandomBrightnessContrast(
-                always_apply=True, contrast_limit=0.2, brightness_limit=0.2
-            ),
-            A.OneOf(
-                [
-                    A.MotionBlur(always_apply=True),
-                    A.GaussNoise(always_apply=True),
-                    A.GaussianBlur(always_apply=True),
-                ],
-                p=0.5,
-            ),
-            A.Rotate(always_apply=True, limit=20, border_mode=cv2.BORDER_REPLICATE),
-        ]
-    )
 
 
 def main() -> None:
