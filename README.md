@@ -92,6 +92,8 @@ Example of serializing a custom pipeline is included in the `src` folder and is 
 
 `python src/datasplit.py --balance --seed 27 --output-path data_balanced data`
 
+The resulting dataset is balanced and contains 41,008 images in total. The training set contains 32,808 images (4,101 in each class) and the test set contains 8,200 images (1,025 in each class). It's available on Kaggle [here](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-dataset).
+
 ## Model
 
 TODO
