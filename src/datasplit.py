@@ -336,13 +336,16 @@ def copy_to_output(from_path: str, to_path: str) -> None:
     :param from_path: Path to a directory with files.
     :param to_path: Path to a directory where files will be copied.
     """
-    logging.info(f"Copying files from {old_train_path} to {train_path}")
+    logging.info(f"Copying files from {from_path} to {to_path}")
     copy_tree(from_path, to_path)
 
 
 def get_pipeline(yaml_path: Union[str, None] = None) -> A.Compose:
     """
     Get pipeline for augmentation.
+
+    :param yaml_path: Path to a custom pipeline serialized to YAML. Can be None to use the default pipeline.
+    :return: Albumentations Compose pipeline.
     """
     if yaml_path is not None:
         if not os.path.exists(yaml_path):
@@ -376,7 +379,7 @@ def get_pipeline(yaml_path: Union[str, None] = None) -> A.Compose:
     )
 
 
-if __name__ == "__main__":
+def main() -> None:
     cli = create_cli()
     args = cli.parse_args()
 
@@ -414,3 +417,7 @@ if __name__ == "__main__":
         global_multiplier=args.global_multiplier,
         seed=args.seed,
     )
+
+
+if __name__ == "__main__":
+    main()
