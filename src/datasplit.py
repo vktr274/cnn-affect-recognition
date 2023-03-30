@@ -266,7 +266,7 @@ def create_cli() -> ArgumentParser:
     parser.add_argument(
         "path",
         type=str,
-        help="Path to a directory with train subdirectory.",
+        help="Path to a directory that includes a train directory with the images in subdirectories named after the labels",
     )
     parser.add_argument(
         "--output-path",

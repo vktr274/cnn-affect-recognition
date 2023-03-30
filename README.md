@@ -27,12 +27,12 @@ Usage:
 
 Positional argument:
 
-- `path` - Path to the dataset that includes a train directory with the images in subdirectories named after the labels, e.g. if `path` is `data`, then the images should be in `data/train/class1`, `data/train/class2`, etc.
+- `path` - Path to a directory that includes a train directory with the images in subdirectories named after the labels, e.g. if `path` is `data`, then the images should be in `data/train/class1`, `data/train/class2`, etc.
 
 Options:
 
 - `-h` - show help message and exit
-- `--output OUTPUT` - Output directory (default: `None` - overwrite the input directory)
+- `--output OUTPUT` - Path to an empty output directory (default: `None` - overwrite input directory)
 - `--train-split TRAIN_SPLIT` - Train split ratio (default: `0.8`)
 - `--seed SEED` - Random seed (default: `None`)
 - `--label-col LABEL_COL` - Label column name (default: `'label'`)
