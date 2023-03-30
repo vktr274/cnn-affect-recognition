@@ -182,6 +182,8 @@ def split_data(
             )
             logging.info(f"Class {c}: multiplier_train = {multiplier_train}")
             logging.info(f"Class {c}: multiplier_test = {multiplier_test}")
+
+            np.random.seed(seed)
             if multiplier_train > 1.0:
                 train_class_df = balance_class(
                     train_class_df,
