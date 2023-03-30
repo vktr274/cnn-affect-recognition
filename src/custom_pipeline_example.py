@@ -19,4 +19,4 @@ pipeline = A.Compose(
     ]
 )
 
-A.save(pipeline, "custom_pipeline-example.yml", data_format="yaml")
+A.save(pipeline, "custom_pipeline_example.yml", data_format="yaml")
