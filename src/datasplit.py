@@ -1,4 +1,5 @@
-from typing import Union
+from importlib import import_module
+from typing import Union, cast
 import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
@@ -6,6 +7,7 @@ import logging
 import os
 import shutil
 from distutils.dir_util import copy_tree
+from importlib.util import find_spec, module_from_spec
 from pathlib import Path
 import albumentations as A
 import cv2
@@ -34,6 +36,7 @@ def balance_class(
     ratio: float,
     label_col: str,
     filename_col: str,
+    pipeline: A.Compose,
     seed: Union[int, None] = None,
 ) -> pd.DataFrame:
     """
@@ -48,23 +51,6 @@ def balance_class(
     :param seed: Random seed.
     :return: Augmented DataFrame.
     """
-    pipeline = A.Compose(
-        [
-            A.HorizontalFlip(p=0.5),
-            A.RandomBrightnessContrast(
-                always_apply=True, contrast_limit=0.2, brightness_limit=0.2
-            ),
-            A.OneOf(
-                [
-                    A.MotionBlur(always_apply=True),
-                    A.GaussNoise(always_apply=True),
-                    A.GaussianBlur(always_apply=True),
-                ],
-                p=0.5,
-            ),
-            A.Rotate(always_apply=True, limit=20, border_mode=cv2.BORDER_REPLICATE),
-        ]
-    )
     augment_count = int(np.ceil(ratio * len(df))) - len(df)
     df_sample = df.sample(n=augment_count, random_state=seed, replace=True)
     row: pd.Series[str]
@@ -128,6 +114,7 @@ def delete_copied(
 def split_data(
     df: pd.DataFrame,
     data_path: str,
+    pipeline: A.Compose,
     train_split=0.8,
     balance=False,
     label_col="label",
@@ -204,6 +191,7 @@ def split_data(
                     multiplier_train,
                     label_col,
                     filename_col,
+                    pipeline,
                     seed,
                 )
                 logging.info(
@@ -217,6 +205,7 @@ def split_data(
                     multiplier_test,
                     label_col,
                     filename_col,
+                    pipeline,
                     seed,
                 )
                 logging.info(
@@ -227,8 +216,19 @@ def split_data(
 
     logging.info(f"Total: {len(train_df)} train samples")
     logging.info(f"Total: {len(test_df)} test samples")
-    train_df.to_csv(os.path.join(data_path, "train.csv"), index=False)
-    test_df.to_csv(os.path.join(data_path, "test.csv"), index=False)
+
+    train_csv_path = os.path.join(data_path, "train.csv")
+    test_csv_path = os.path.join(data_path, "test.csv")
+
+    logging.info(
+        f"Saving train DataFrame to {train_csv_path} with columns {label_col} and {filename_col}"
+    )
+    logging.info(
+        f"Saving test DataFrame to {test_csv_path} with columns {label_col} and {filename_col}"
+    )
+
+    train_df.to_csv(train_csv_path, index=False)
+    test_df.to_csv(test_csv_path, index=False)
 
 
 def load_dataframe(train_path: str, label_col: str, filename_col: str) -> pd.DataFrame:
@@ -240,6 +240,9 @@ def load_dataframe(train_path: str, label_col: str, filename_col: str) -> pd.Dat
     :param filename_col: Name of filename column.
     :return: DataFrame with labels and filenames.
     """
+    logging.info(
+        f"Creating DataFrame of labels and filenames from {train_path} with columns {label_col} and {filename_col}"
+    )
     df = pd.DataFrame(columns=[label_col, filename_col])
     for label in os.listdir(train_path):
         label_path = os.path.join(train_path, label)
@@ -269,7 +272,7 @@ def create_cli() -> ArgumentParser:
         "--output-path",
         type=str,
         default=None,
-        help="Path to an output directory (default: None - overwrite input directory)",
+        help="Path to an empty output directory (default: None - overwrite input directory)",
     )
     parser.add_argument(
         "--train-split",
@@ -326,7 +329,31 @@ def copy_to_output(from_path: str, to_path: str) -> None:
     :param from_path: Path to a directory with files.
     :param to_path: Path to a directory where files will be copied.
     """
+    logging.info(f"Copying files from {old_train_path} to {train_path}")
     copy_tree(from_path, to_path)
+
+
+def get_pipeline() -> A.Compose:
+    """
+    Get pipeline for augmentation.
+    """
+    return A.Compose(
+        [
+            A.HorizontalFlip(p=0.5),
+            A.RandomBrightnessContrast(
+                always_apply=True, contrast_limit=0.2, brightness_limit=0.2
+            ),
+            A.OneOf(
+                [
+                    A.MotionBlur(always_apply=True),
+                    A.GaussNoise(always_apply=True),
+                    A.GaussianBlur(always_apply=True),
+                ],
+                p=0.5,
+            ),
+            A.Rotate(always_apply=True, limit=20, border_mode=cv2.BORDER_REPLICATE),
+        ]
+    )
 
 
 if __name__ == "__main__":
@@ -343,20 +370,21 @@ if __name__ == "__main__":
     if not os.path.exists(train_path):
         logging.error(f"Path {path} does not include train subdirectory.")
 
+    pipeline = get_pipeline()
+
     if args.output_path is not None:
         old_train_path = train_path
         path = args.output_path
         train_path = os.path.join(args.output_path, "train")
         Path(train_path).mkdir(parents=True, exist_ok=True)
-        logging.info(f"Copying files from {old_train_path} to {train_path}")
         copy_to_output(old_train_path, train_path)
 
-    logging.info(f"Creating DataFrame of labels and filenames from {train_path}")
     df = load_dataframe(train_path, args.label_col, args.filename_col)
 
     split_data(
         df=df,
         data_path=path,
+        pipeline=pipeline,
         train_split=args.train_split,
         balance=args.balance,
         label_col=args.label_col,
