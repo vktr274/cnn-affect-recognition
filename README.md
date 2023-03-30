@@ -9,9 +9,52 @@ We used the [Facial Expressions Training Data](https://www.kaggle.com/datasets/n
 
 ## Preprocessing
 
-We created a Python script that splits the dataset into training and test sets and optionally balances the dataset. The script also creates a CSV file with label to filename mappings. The script is located in the `src` folder and is named `datasplit.py`.
+We created a Python script that splits the dataset into training and test sets and optionally balances the dataset by augmenting classes smaller in size relative to the largest class. If balancing is enabled, it can also optionally perform global augmentation. Meaning that the number of images in each class can be increased by a global multiplier. The script also creates a CSV file with the label to filename mappings for the training and test sets.
 
-Before running the script, the dataset should be downloaded and extracted to a train subdirectory of an arbitrary otherwise empty folder. The script will create a `test` subdirectory in the folder and will move the images to the appropriate subdirectories. The script will also create a `train.csv` and `test.csv` files in the folder. The `train.csv` file will contain the label to filename mappings for the training set and the `test.csv` file will contain the label to filename mappings for the test set.
+The augmentation pipleine used it the script is created using the [Albumentations](https://albumentations.ai/) library. The pipeline is a composition of transformations that are applied to the images and is defined like this:
+
+```py
+A.Compose(
+  [
+    A.HorizontalFlip(p=0.5),
+    A.RandomBrightnessContrast(
+      always_apply=True, contrast_limit=0.2, brightness_limit=0.2
+    ),
+    A.OneOf(
+      [
+        A.MotionBlur(always_apply=True),
+        A.GaussNoise(always_apply=True),
+        A.GaussianBlur(always_apply=True),
+      ],
+      p=0.5,
+    ),
+    A.Rotate(always_apply=True, limit=20, border_mode=cv2.BORDER_REPLICATE),
+  ]
+)
+```
+
+Horizontal flip is applied with a probability of 50%. Random brightness and contrast are always applied with a contrast limit of &pm;20% and a brightness limit of &pm;20%. One of motion blur, Gaussian noise, or Gaussian blur is applied with a probability of 50%. Rotation by a random angle is always applied with a limit of &pm;20 degrees and border mode set to replicate colors at the borders of the image being rotated to avoid black borders.
+
+If enabled, augmentations are applied both to the training and test sets.
+
+Before running the script, make sure that the dataset is downloaded and extracted to a folder with the following structure:
+
+```text
+your_dataset_folder
+└── train
+    ├── anger
+    ├── contempt
+    ├── disgust
+    ├── fear
+    ├── happy
+    ├── neutral
+    ├── sad
+    └── surprise
+```
+
+The script will create a `test` subdirectory in the directory and will move part of the images from the `train` subdirectory to the `test` subdirectory. This means that the default behavior of the script is to overwrite the input directory. The script will also create a `train.csv` and `test.csv` files in the directory. The `train.csv` file will contain the label to filename mappings for the training set and the `test.csv` file will contain the label to filename mappings for the test set.
+
+If the script is ran with a specified output path, the script will first copy the images from the `train` subdirectory in the input directory to the `train` subdirectory in the output directory and will create the `test` subdirectory in the output directory. The `train.csv` and `test.csv` files will be created in the output directory. If the output directory does not exist, it will be created. If the output directory exists, it can only contain an empty `train` subdirectory.
 
 Besides the dataset, the script requires installation of required Python packages listed in the `requirements.txt` file. The packages can be installed using the following command:
 
