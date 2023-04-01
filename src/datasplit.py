@@ -23,19 +23,19 @@ def calculate_class_multiplier(
     :param class_df: DataFrame with labels and paths for a single class.
     :param largest_class_size: Largest class size.
     :param global_multiplier: Global multiplier for every class.
-    :return: Multiplier.
+    :return: Class multiplier.
     """
     return global_multiplier * largest_class_size / len(class_df)
 
 
 def balance_class(
     df: pd.DataFrame,
+    pipeline: A.Compose,
     data_path: str,
     subset: str,
-    ratio: float,
-    label_col: str,
-    filename_col: str,
-    pipeline: A.Compose,
+    multiplier: float,
+    label_col="label",
+    filename_col="filename",
     seed: Union[int, None] = None,
 ) -> pd.DataFrame:
     """
@@ -44,13 +44,13 @@ def balance_class(
     :param df: DataFrame with labels and paths for a single class.
     :param data_path: Path to data directory.
     :param subset: Subset name.
-    :param ratio: Ratio for class.
+    :param multiplier: Multiplier for class.
     :param label_col: Name of label column.
     :param filename_col: Name of filename column.
     :param seed: Random seed.
     :return: Augmented DataFrame.
     """
-    augment_count = int(np.ceil(ratio * len(df))) - len(df)
+    augment_count = int(np.ceil(multiplier * len(df))) - len(df)
     df_sample = df.sample(n=augment_count, random_state=seed, replace=True)
     row: pd.Series[str]
     for _, row in df_sample.iterrows():
@@ -71,7 +71,7 @@ def balance_class(
 
 
 def copy_test(
-    df: pd.DataFrame, data_path: str, label_col: str, filename_col: str
+    df: pd.DataFrame, data_path: str, label_col="label", filename_col="filename"
 ) -> None:
     """
     Copy test files to test subdirectory.
@@ -92,7 +92,7 @@ def copy_test(
 
 
 def delete_copied(
-    df: pd.DataFrame, data_path: str, label_col: str, filename_col: str
+    df: pd.DataFrame, data_path: str, label_col="label", filename_col="filename"
 ) -> None:
     """
     Delete copied test files from train subdirectory.
@@ -165,20 +165,26 @@ def split_data(
         logging.info(
             f"Class {c}: copying {len(test_class_df)} test files from train to test subdirectory"
         )
-        copy_test(test_class_df, data_path, label_col, filename_col)
+        copy_test(
+            test_class_df, data_path, label_col=label_col, filename_col=filename_col
+        )
         logging.info(
             f"Class {c}: deleting {len(test_class_df)} copied test files from train subdirectory"
         )
-        delete_copied(test_class_df, data_path, label_col, filename_col)
+        delete_copied(
+            test_class_df, data_path, label_col=label_col, filename_col=filename_col
+        )
 
         if balance:
             multiplier_train = calculate_class_multiplier(
-                train_class_df, largest_train_class_size, global_multiplier
+                train_class_df,
+                largest_train_class_size,
+                global_multiplier=global_multiplier,
             )
             multiplier_test = calculate_class_multiplier(
                 test_class_df,
                 largest_class_size - largest_train_class_size,
-                global_multiplier,
+                global_multiplier=global_multiplier,
             )
             logging.info(f"Class {c}: multiplier_train = {multiplier_train}")
             logging.info(f"Class {c}: multiplier_test = {multiplier_test}")
@@ -187,13 +193,13 @@ def split_data(
             if multiplier_train > 1.0:
                 train_class_df = balance_class(
                     train_class_df,
+                    pipeline,
                     data_path,
                     "train",
                     multiplier_train,
-                    label_col,
-                    filename_col,
-                    pipeline,
-                    seed,
+                    label_col=label_col,
+                    filename_col=filename_col,
+                    seed=seed,
                 )
                 logging.info(
                     f"Class {c}: augmented to {len(train_class_df)} train samples"
@@ -201,13 +207,13 @@ def split_data(
             if multiplier_test > 1.0:
                 test_class_df = balance_class(
                     test_class_df,
+                    pipeline,
                     data_path,
                     "test",
                     multiplier_test,
-                    label_col,
-                    filename_col,
-                    pipeline,
-                    seed,
+                    label_col=label_col,
+                    filename_col=filename_col,
+                    seed=seed,
                 )
                 logging.info(
                     f"Class {c}: augmented to {len(test_class_df)} test samples"
@@ -232,7 +238,9 @@ def split_data(
     test_df.to_csv(test_csv_path, index=False)
 
 
-def load_dataframe(train_path: str, label_col: str, filename_col: str) -> pd.DataFrame:
+def load_dataframe(
+    train_path: str, label_col="label", filename_col="filename"
+) -> pd.DataFrame:
     """
     Load DataFrame with labels and filenames.
 
@@ -404,12 +412,14 @@ def main() -> None:
         Path(train_path).mkdir(parents=True, exist_ok=True)
         copy_to_output(old_train_path, train_path)
 
-    df = load_dataframe(train_path, args.label_col, args.filename_col)
+    df = load_dataframe(
+        train_path, label_col=args.label_col, filename_col=args.filename_col
+    )
 
     split_data(
-        df=df,
-        data_path=path,
-        pipeline=pipeline,
+        df,
+        path,
+        pipeline,
         train_split=args.train_split,
         balance=args.balance,
         label_col=args.label_col,
