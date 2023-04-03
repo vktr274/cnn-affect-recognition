@@ -1,4 +1,5 @@
-# ResNet-50 based on the 'Deep Residual Learning for Image Recognition' paper
+# ResNet-18, ResNet-34, ResNet-50, ResNet-101, and ResNet-152
+# based on the 'Deep Residual Learning for Image Recognition' paper
 # by Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun
 # https://arxiv.org/pdf/1512.03385.pdf
 
