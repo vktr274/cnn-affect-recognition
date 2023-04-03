@@ -4,10 +4,10 @@
 
 import json
 from typing import Tuple, Union
-from keras import Input
-from keras.models import Model
-from keras.regularizers import Regularizer
-from keras.layers import (
+from tensorflow.keras import Input
+from tensorflow.keras.models import Model
+from tensorflow.keras.regularizers import Regularizer
+from tensorflow.keras.layers import (
     Dropout,
     Rescaling,
     Conv2D,
