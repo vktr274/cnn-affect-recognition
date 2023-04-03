@@ -84,10 +84,9 @@ Options:
 - `--global-multiplier GLOBAL_MULTIPLIER` - Global multiplier for the number of images in each class (default: `1.0`). This option can be used to increase the number of images in each class but is ignored if `--balance` is not used.
 - `--pipeline-yaml` - Path to a custom Albumentations Compose pipeline serialized to YAML (default: `None` - use pipeline included in this script)
 
-If you would like to use the `--pipeline-yaml` option, the following is a brief description of how to create a custom pipeline and serialize it to YAML:
+If you would like to use the `--pipeline-yaml` option, the following is a brief description of a custom pipeline and its serialization:
 
-The pipeline should be serialized to YAML and has to be an instance of [`albumentations.core.composition.Compose`](https://albumentations.ai/docs/api_reference/core/composition/#albumentations.core.composition.Compose).
-The pipeline can be serialized using [`albumentations.core.serialization.save`](https://albumentations.ai/docs/api_reference/core/serialization/#albumentations.core.serialization.save).
+The pipeline has to be an instance of [`albumentations.core.composition.Compose`](https://albumentations.ai/docs/api_reference/core/composition/#albumentations.core.composition.Compose) and it must be serialized to a YAML file using [`albumentations.core.serialization.save`](https://albumentations.ai/docs/api_reference/core/serialization/#albumentations.core.serialization.save). The script will then internally be able to deserialize the pipeline using [`albumentations.core.serialization.load`](https://albumentations.ai/docs/api_reference/core/serialization/#albumentations.core.serialization.load).
 
 Example of serializing a custom pipeline is included in the `src` folder and is named `custom_pipeline_example.py`. Example of a serialized pipeline is included in the root folder and is named `custom_pipeline_example.yaml`.
 
