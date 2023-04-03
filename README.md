@@ -84,7 +84,7 @@ Options:
 - `--global-multiplier GLOBAL_MULTIPLIER` - Global multiplier for the number of images in each class (default: `1.0`). This option can be used to increase the number of images in each class but is ignored if `--balance` is not used.
 - `--pipeline-yaml` - Path to a custom Albumentations Compose pipeline serialized to YAML (default: `None` - use pipeline included in this script)
 
-If you would like to use the `--pipeline-yaml`, the following is a brief description of how to create a custom pipeline and serialize it to YAML:
+If you would like to use the `--pipeline-yaml` option, the following is a brief description of how to create a custom pipeline and serialize it to YAML:
 
 A custom Albumentations Compose pipeline can be serialized using [`albumentations.core.serialization.save`](https://albumentations.ai/docs/api_reference/core/serialization/#albumentations.core.serialization.save). The pipeline should be serialized to YAML and has to be an instance of [`albumentations.core.composition.Compose`](https://albumentations.ai/docs/api_reference/core/composition/#albumentations.core.composition.Compose).
 
