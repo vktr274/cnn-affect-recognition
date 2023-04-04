@@ -3,7 +3,6 @@
 # by Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun
 # https://arxiv.org/pdf/1512.03385.pdf
 
-import json
 from typing import Tuple, Union
 from tensorflow.keras import Input
 from tensorflow.keras.models import Model
@@ -29,6 +28,17 @@ def ResidualBlockLarge(
     reduce=False,
     kernel_regularizer: Union[Regularizer, None] = None,
 ):
+    """
+    Create a ResNet block with 3 layers
+
+    :param x_in: input tensor
+    :param filters: number of filters in each layer
+    :param s: stride used when reducing the input tensor
+    :param reduce: whether to reduce the input tensor
+    :param kernel_regularizer: kernel regularizer
+
+    :return: output tensor
+    """
     filters1, filters2, filters3 = filters
 
     y_out = Conv2D(
@@ -75,6 +85,16 @@ def ResidualBlockSmall(
     reduce=False,
     kernel_regularizer: Union[Regularizer, None] = None,
 ):
+    """
+    Create a ResNet block with 2 layers
+
+    :param x_in: input tensor
+    :param filters: number of filters in each layer
+    :param s: stride used when reducing the input tensor
+    :param reduce: whether to reduce the input tensor
+
+    :return: output tensor
+    """
     filters1, filters2 = filters
 
     y_out = Conv2D(
@@ -119,6 +139,19 @@ def ResNet(
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
 ) -> Model:
+    """
+    Create one of ResNet-18, ResNet-34, ResNet-50, ResNet-101, and ResNet-152
+
+    :param output_units: number of output units
+    :param input_shape: input shape
+    :param block_sizes: number of layers in each block
+    :param net_size: 'small' or 'large'
+    :param normalize: whether to normalize the input
+    :param kernel_regularizer: kernel regularizer
+    :param dropout_rate: dropout rate
+
+    :return: ResNet model
+    """
     x_in = Input(shape=input_shape)
     y_out = x_in
 
@@ -225,6 +258,17 @@ def ResNet18(
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
 ) -> Model:
+    """
+    Create a ResNet-18 model.
+
+    :param output_units: The number of output units.
+    :param input_shape: The shape of the input.
+    :param normalize: Whether to normalize the input.
+    :param kernel_regularizer: The kernel regularizer to use.
+    :param dropout_rate: The dropout rate to use.
+
+    :return: The model.
+    """
     return ResNet(
         output_units,
         input_shape,
@@ -243,6 +287,17 @@ def ResNet34(
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
 ) -> Model:
+    """
+    Create a ResNet-34 model.
+
+    :param output_units: The number of output units.
+    :param input_shape: The shape of the input.
+    :param normalize: Whether to normalize the input.
+    :param kernel_regularizer: The kernel regularizer to use.
+    :param dropout_rate: The dropout rate to use.
+
+    :return: The model.
+    """
     return ResNet(
         output_units,
         input_shape,
@@ -261,6 +316,17 @@ def ResNet50(
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
 ) -> Model:
+    """
+    Create a ResNet-50 model.
+
+    :param output_units: The number of output units.
+    :param input_shape: The shape of the input.
+    :param normalize: Whether to normalize the input.
+    :param kernel_regularizer: The kernel regularizer to use.
+    :param dropout_rate: The dropout rate to use.
+
+    :return: The model.
+    """
     return ResNet(
         output_units,
         input_shape,
@@ -279,6 +345,17 @@ def ResNet101(
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
 ) -> Model:
+    """
+    Create a ResNet-101 model.
+
+    :param output_units: The number of output units.
+    :param input_shape: The shape of the input.
+    :param normalize: Whether to normalize the input.
+    :param kernel_regularizer: The kernel regularizer to use.
+    :param dropout_rate: The dropout rate to use.
+
+    :return: The model.
+    """
     return ResNet(
         output_units,
         input_shape,
@@ -297,6 +374,17 @@ def ResNet152(
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
 ) -> Model:
+    """
+    Create a ResNet-152 model.
+
+    :param output_units: The number of output units.
+    :param input_shape: The shape of the input.
+    :param normalize: Whether to normalize the input.
+    :param kernel_regularizer: The kernel regularizer to use.
+    :param dropout_rate: The dropout rate to use.
+
+    :return: The model.
+    """
     return ResNet(
         output_units,
         input_shape,
@@ -308,16 +396,14 @@ def ResNet152(
     )
 
 
-def write_json_summary(model: Model, file_path: str) -> None:
+def write_summary(model: Model, file_path: str) -> None:
     """Write a summary of the model to a JSON file.
 
-    Args:
-        model: The model to summarize.
-        file_path: The path to the JSON file to write.
+    :param model: The model to summarize.
+    :param file_path: The path to the JSON file to write.
     """
-    summary = model.to_json()
     with open(file_path, "w") as f:
-        json.dump(summary, f)
+        model.summary(print_fn=lambda x: f.write(x + "\n"))
 
 
 if __name__ == "__main__":
@@ -327,16 +413,16 @@ if __name__ == "__main__":
     normalize = True
 
     model = ResNet18(outputs, input_shape, normalize=normalize)
-    write_json_summary(model, "resnet18.json")
+    write_summary(model, "resnet18.txt")
 
     model = ResNet34(outputs, input_shape, normalize=normalize)
-    write_json_summary(model, "resnet34.json")
+    write_summary(model, "resnet34.txt")
 
     model = ResNet50(outputs, input_shape, normalize=normalize)
-    write_json_summary(model, "resnet50.json")
+    write_summary(model, "resnet50.txt")
 
     model = ResNet101(outputs, input_shape, normalize=normalize)
-    write_json_summary(model, "resnet101.json")
+    write_summary(model, "resnet101.txt")
 
     model = ResNet152(outputs, input_shape, normalize=normalize)
-    write_json_summary(model, "resnet152.json")
+    write_summary(model, "resnet152.txt")
