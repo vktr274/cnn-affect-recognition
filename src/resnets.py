@@ -244,9 +244,9 @@ def ResNet(
         )
 
     y_out = GlobalAveragePooling2D()(y_out)
-    y_out = Dense(output_units, kernel_regularizer=kernel_regularizer)(y_out)
     if dropout_rate > 0.0:
         y_out = Dropout(dropout_rate)(y_out)
+    y_out = Dense(output_units, kernel_regularizer=kernel_regularizer)(y_out)
     y_out = Softmax()(y_out)
 
     return Model(inputs=x_in, outputs=y_out)
