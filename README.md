@@ -28,12 +28,13 @@ A.Compose(
       ],
       p=0.5,
     ),
+    A.PixelDropout(p=0.25),
     A.Rotate(always_apply=True, limit=20, border_mode=cv2.BORDER_REPLICATE),
   ]
 )
 ```
 
-Horizontal flip is applied with a probability of 50%. Random brightness and contrast are always applied with a contrast limit of &pm;20% and a brightness limit of &pm;20%. One of motion blur, Gaussian noise, or Gaussian blur is applied with a probability of 50%. Rotation by a random angle is always applied with a limit of &pm;20 degrees and border mode set to replicate colors at the borders of the image being rotated to avoid black borders.
+Horizontal flip is applied with a probability of 50%. Random brightness and contrast are always applied with a contrast limit of &pm;20% and a brightness limit of &pm;20%. One of motion blur, Gaussian noise, or Gaussian blur is applied with a probability of 50%. Pixel dropout is applied with a probability of 25%. Rotation by a random angle is always applied with a limit of &pm;20 degrees and border mode set to replicate colors at the borders of the image being rotated to avoid black borders.
 
 If enabled, augmentations are applied both to the training and test sets.
 
@@ -92,9 +93,19 @@ Example of serializing a custom pipeline is included in the `src` folder and is 
 
 **How we ran the script:**
 
-`python src/datasplit.py --balance --seed 27 --output-path data_balanced data`
+`python src/datasplit.py --balance --seed 27 --output-path data_balanced_1x data`
 
-The resulting dataset is balanced and contains 41,008 images in total. The training set contains 32,808 images (4,101 in each class) and the test set contains 8,200 images (1,025 in each class). It's available on Kaggle [here](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-dataset).
+The resulting dataset is balanced and contains 41,008 images in total. The training set contains 32,808 images (4,101 in each class) and the test set contains 8,200 images (1,025 in each class).
+
+`python src/datasplit.py --balance --seed 27 --global-multiplier 2.0 --output-path data_balanced_2x data`
+
+The resulting dataset is balanced and contains 82,016 images in total. The training set contains 65,616 images (8,202 in each class) and the test set contains 16,400 images (2,050 in each class).
+
+`python src/datasplit.py --balance --seed 27 --global-multiplier 3.0 --output-path data_balanced_3x data`
+
+The resulting dataset is balanced and contains 123,024 images in total. The training set contains 98,424 images (12,303 in each class) and the test set contains 24,600 images (3,075 in each class).
+
+All three are available on Kaggle: [Facial Affect Dataset](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-dataset)
 
 ## Model
 

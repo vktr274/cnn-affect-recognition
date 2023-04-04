@@ -308,6 +308,7 @@ def get_pipeline(yaml_path: Union[str, None] = None) -> A.Compose:
                 ],
                 p=0.5,
             ),
+            A.PixelDropout(p=0.25),
             A.Rotate(always_apply=True, limit=20, border_mode=cv2.BORDER_REPLICATE),
         ]
     )
