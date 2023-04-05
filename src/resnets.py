@@ -46,6 +46,7 @@ def ResidualBlockLarge(
         kernel_size=(1, 1),
         strides=(s, s),
         kernel_regularizer=kernel_regularizer,
+        kernel_initializer="he_uniform",
     )(x_in)
     y_out = BatchNormalization()(y_out)
     y_out = ReLU()(y_out)
@@ -55,13 +56,17 @@ def ResidualBlockLarge(
         kernel_size=(3, 3),
         padding="same",
         kernel_regularizer=kernel_regularizer,
+        kernel_initializer="he_uniform",
     )(y_out)
     y_out = BatchNormalization()(y_out)
     y_out = ReLU()(y_out)
 
-    y_out = Conv2D(filters3, kernel_size=(1, 1), kernel_regularizer=kernel_regularizer)(
-        y_out
-    )
+    y_out = Conv2D(
+        filters3,
+        kernel_size=(1, 1),
+        kernel_regularizer=kernel_regularizer,
+        kernel_initializer="he_uniform",
+    )(y_out)
     y_out = BatchNormalization()(y_out)
 
     if reduce:
@@ -70,6 +75,7 @@ def ResidualBlockLarge(
             kernel_size=(1, 1),
             strides=(s, s),
             kernel_regularizer=kernel_regularizer,
+            kernel_initializer="he_uniform",
         )(x_in)
         x_in = BatchNormalization()(x_in)
 
@@ -103,6 +109,7 @@ def ResidualBlockSmall(
         strides=(s, s),
         padding="same",
         kernel_regularizer=kernel_regularizer,
+        kernel_initializer="he_uniform",
     )(x_in)
     y_out = BatchNormalization()(y_out)
     y_out = ReLU()(y_out)
@@ -112,6 +119,7 @@ def ResidualBlockSmall(
         kernel_size=(3, 3),
         padding="same",
         kernel_regularizer=kernel_regularizer,
+        kernel_initializer="he_uniform",
     )(y_out)
     y_out = BatchNormalization()(y_out)
     y_out = ReLU()(y_out)
@@ -122,6 +130,7 @@ def ResidualBlockSmall(
             kernel_size=(1, 1),
             strides=(s, s),
             kernel_regularizer=kernel_regularizer,
+            kernel_initializer="he_uniform",
         )(x_in)
         x_in = BatchNormalization()(x_in)
 
@@ -159,7 +168,11 @@ def ResNet(
     if normalize:
         y_out = Rescaling(scale=1.0 / 255)(y_out)
     y_out = Conv2D(
-        64, kernel_size=(7, 7), strides=(2, 2), kernel_regularizer=kernel_regularizer
+        64,
+        kernel_size=(7, 7),
+        strides=(2, 2),
+        kernel_regularizer=kernel_regularizer,
+        kernel_initializer="he_uniform",
     )(y_out)
     y_out = BatchNormalization()(y_out)
     y_out = ReLU()(y_out)
@@ -249,7 +262,11 @@ def ResNet(
         y_out = Dropout(dropout_rate)(y_out)
 
     if include_top:
-        y_out = Dense(output_units, kernel_regularizer=kernel_regularizer)(y_out)
+        y_out = Dense(
+            output_units,
+            kernel_regularizer=kernel_regularizer,
+            kernel_initializer="he_uniform",
+        )(y_out)
         y_out = Softmax()(y_out)
 
     return Model(inputs=x_in, outputs=y_out)
