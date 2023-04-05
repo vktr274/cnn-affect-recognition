@@ -27,6 +27,7 @@ def ResidualBlockLarge(
     s=1,
     reduce=False,
     kernel_regularizer: Union[Regularizer, None] = None,
+    kernel_initializer="he_uniform",
 ):
     """
     Create a ResNet block with 3 layers
@@ -46,7 +47,7 @@ def ResidualBlockLarge(
         kernel_size=(1, 1),
         strides=(s, s),
         kernel_regularizer=kernel_regularizer,
-        kernel_initializer="he_uniform",
+        kernel_initializer=kernel_initializer,
     )(x_in)
     y_out = BatchNormalization()(y_out)
     y_out = ReLU()(y_out)
@@ -56,7 +57,7 @@ def ResidualBlockLarge(
         kernel_size=(3, 3),
         padding="same",
         kernel_regularizer=kernel_regularizer,
-        kernel_initializer="he_uniform",
+        kernel_initializer=kernel_initializer,
     )(y_out)
     y_out = BatchNormalization()(y_out)
     y_out = ReLU()(y_out)
@@ -65,7 +66,7 @@ def ResidualBlockLarge(
         filters3,
         kernel_size=(1, 1),
         kernel_regularizer=kernel_regularizer,
-        kernel_initializer="he_uniform",
+        kernel_initializer=kernel_initializer,
     )(y_out)
     y_out = BatchNormalization()(y_out)
 
@@ -75,7 +76,7 @@ def ResidualBlockLarge(
             kernel_size=(1, 1),
             strides=(s, s),
             kernel_regularizer=kernel_regularizer,
-            kernel_initializer="he_uniform",
+            kernel_initializer=kernel_initializer,
         )(x_in)
         x_in = BatchNormalization()(x_in)
 
@@ -90,6 +91,7 @@ def ResidualBlockSmall(
     s=1,
     reduce=False,
     kernel_regularizer: Union[Regularizer, None] = None,
+    kernel_initializer="he_uniform",
 ):
     """
     Create a ResNet block with 2 layers
@@ -109,7 +111,7 @@ def ResidualBlockSmall(
         strides=(s, s),
         padding="same",
         kernel_regularizer=kernel_regularizer,
-        kernel_initializer="he_uniform",
+        kernel_initializer=kernel_initializer,
     )(x_in)
     y_out = BatchNormalization()(y_out)
     y_out = ReLU()(y_out)
@@ -119,7 +121,7 @@ def ResidualBlockSmall(
         kernel_size=(3, 3),
         padding="same",
         kernel_regularizer=kernel_regularizer,
-        kernel_initializer="he_uniform",
+        kernel_initializer=kernel_initializer,
     )(y_out)
     y_out = BatchNormalization()(y_out)
     y_out = ReLU()(y_out)
@@ -130,7 +132,7 @@ def ResidualBlockSmall(
             kernel_size=(1, 1),
             strides=(s, s),
             kernel_regularizer=kernel_regularizer,
-            kernel_initializer="he_uniform",
+            kernel_initializer=kernel_initializer,
         )(x_in)
         x_in = BatchNormalization()(x_in)
 
@@ -147,6 +149,7 @@ def ResNet(
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
+    kernel_initializer="he_uniform",
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -172,7 +175,7 @@ def ResNet(
         kernel_size=(7, 7),
         strides=(2, 2),
         kernel_regularizer=kernel_regularizer,
-        kernel_initializer="he_uniform",
+        kernel_initializer=kernel_initializer,
     )(y_out)
     y_out = BatchNormalization()(y_out)
     y_out = ReLU()(y_out)
@@ -189,6 +192,7 @@ def ResNet(
                 s=2 if layer == 0 else 1,
                 reduce=layer == 0,
                 kernel_regularizer=kernel_regularizer,
+                kernel_initializer=kernel_initializer,
             )
             if net_size == "large"
             else ResidualBlockSmall(
@@ -197,6 +201,7 @@ def ResNet(
                 s=1,
                 reduce=False,
                 kernel_regularizer=kernel_regularizer,
+                kernel_initializer=kernel_initializer,
             )
         )
 
@@ -208,6 +213,7 @@ def ResNet(
                 s=2 if layer == 0 else 1,
                 reduce=layer == 0,
                 kernel_regularizer=kernel_regularizer,
+                kernel_initializer=kernel_initializer,
             )
             if net_size == "large"
             else ResidualBlockSmall(
@@ -216,6 +222,7 @@ def ResNet(
                 s=2 if layer == 0 else 1,
                 reduce=layer == 0,
                 kernel_regularizer=kernel_regularizer,
+                kernel_initializer=kernel_initializer,
             )
         )
 
@@ -227,6 +234,7 @@ def ResNet(
                 s=2 if layer == 0 else 1,
                 reduce=layer == 0,
                 kernel_regularizer=kernel_regularizer,
+                kernel_initializer=kernel_initializer,
             )
             if net_size == "large"
             else ResidualBlockSmall(
@@ -235,6 +243,7 @@ def ResNet(
                 s=2 if layer == 0 else 1,
                 reduce=layer == 0,
                 kernel_regularizer=kernel_regularizer,
+                kernel_initializer=kernel_initializer,
             )
         )
 
@@ -246,6 +255,7 @@ def ResNet(
                 s=2 if layer == 0 else 1,
                 reduce=layer == 0,
                 kernel_regularizer=kernel_regularizer,
+                kernel_initializer=kernel_initializer,
             )
             if net_size == "large"
             else ResidualBlockSmall(
@@ -254,6 +264,7 @@ def ResNet(
                 s=2 if layer == 0 else 1,
                 reduce=layer == 0,
                 kernel_regularizer=kernel_regularizer,
+                kernel_initializer=kernel_initializer,
             )
         )
 
@@ -265,7 +276,7 @@ def ResNet(
         y_out = Dense(
             output_units,
             kernel_regularizer=kernel_regularizer,
-            kernel_initializer="he_uniform",
+            kernel_initializer=kernel_initializer,
         )(y_out)
         y_out = Softmax()(y_out)
 
@@ -278,6 +289,7 @@ def ResNet18(
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
+    kernel_initializer="he_uniform",
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -299,6 +311,7 @@ def ResNet18(
         include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
+        kernel_initializer=kernel_initializer,
         dropout_rate=dropout_rate,
     )
 
@@ -309,6 +322,7 @@ def ResNet34(
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
+    kernel_initializer="he_uniform",
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -330,6 +344,7 @@ def ResNet34(
         include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
+        kernel_initializer=kernel_initializer,
         dropout_rate=dropout_rate,
     )
 
@@ -340,6 +355,7 @@ def ResNet50(
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
+    kernel_initializer="he_uniform",
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -361,6 +377,7 @@ def ResNet50(
         include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
+        kernel_initializer=kernel_initializer,
         dropout_rate=dropout_rate,
     )
 
@@ -371,6 +388,7 @@ def ResNet101(
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
+    kernel_initializer="he_uniform",
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -392,6 +410,7 @@ def ResNet101(
         include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
+        kernel_initializer=kernel_initializer,
         dropout_rate=dropout_rate,
     )
 
@@ -402,6 +421,7 @@ def ResNet152(
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
+    kernel_initializer="he_uniform",
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -423,6 +443,7 @@ def ResNet152(
         include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
+        kernel_initializer=kernel_initializer,
         dropout_rate=dropout_rate,
     )
 
