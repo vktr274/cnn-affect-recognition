@@ -94,15 +94,15 @@ Example of serializing a custom pipeline is included in the [`src`](./src) folde
 
 **How we ran the script:**
 
-`python src/datasplit.py --balance --seed 27 --output-path data_balanced_1x data`
+`python src/datasplit.py --balance-train --balance-test --seed 27 --output-path data_balanced_1x data`
 
 The resulting dataset is balanced and contains 41,008 images in total. The training set contains 32,808 images (4,101 in each class) and the test set contains 8,200 images (1,025 in each class).
 
-`python src/datasplit.py --balance --seed 27 --global-multiplier 2.0 --output-path data_balanced_2x data`
+`python src/datasplit.py --balance-train --balance-test --seed 27 --global-multiplier 2.0 --output-path data_balanced_2x data`
 
 The resulting dataset is balanced and contains 82,016 images in total. The training set contains 65,616 images (8,202 in each class) and the test set contains 16,400 images (2,050 in each class).
 
-`python src/datasplit.py --balance --seed 27 --global-multiplier 3.0 --output-path data_balanced_3x data`
+`python src/datasplit.py --balance-train --balance-test --seed 27 --global-multiplier 3.0 --output-path data_balanced_3x data`
 
 The resulting dataset is balanced and contains 123,024 images in total. The training set contains 98,424 images (12,303 in each class) and the test set contains 24,600 images (3,075 in each class).
 
