@@ -57,7 +57,7 @@ The script will create a `test` subdirectory in the directory and will move part
 
 If the script is ran with a specified output path, the script will first copy the images from the `train` subdirectory in the input directory to the `train` subdirectory in the output directory and will create the `test` subdirectory in the output directory. The `train.csv` and `test.csv` files will be created in the output directory. If the output directory does not exist, it will be created. If the output directory exists, it can only contain an empty `train` subdirectory or can be empty completely.
 
-Besides the dataset, the script requires installation of required Python packages listed in the `requirements.txt` file. The packages can be installed using the following command:
+Besides the dataset, the script requires installation of required Python packages listed in the [`requirements.txt`](./requirements.txt) file. The packages can be installed using the following command:
 
 `pip install -r requirements.txt`
 
@@ -65,7 +65,7 @@ The script is universal and can be used for any dataset that has the same struct
 
 ### Running the Script
 
-Usage:
+The script is available in the [`src/datasplit.py`](./src/datasplit.py) file. It can be run following this pattern:
 
 `python datasplit.py [-h] [--balance] [--output-path OUTPUT_PATH] [--train-split TRAIN_SPLIT] [--seed SEED] [--label-col LABEL_COL] [--filename-col FILENAME_COL] [--global-multiplier GLOBAL_MULTIPLIER] [--pipeline-yaml PIPELINE_YAML] path`
 
@@ -89,7 +89,7 @@ If you would like to use the `--pipeline-yaml` option, the following is a brief 
 
 The pipeline has to be an instance of [`albumentations.core.composition.Compose`](https://albumentations.ai/docs/api_reference/core/composition/#albumentations.core.composition.Compose) and it must be serialized to a YAML file using [`albumentations.core.serialization.save`](https://albumentations.ai/docs/api_reference/core/serialization/#albumentations.core.serialization.save). The script will then internally be able to deserialize the pipeline using [`albumentations.core.serialization.load`](https://albumentations.ai/docs/api_reference/core/serialization/#albumentations.core.serialization.load).
 
-Example of serializing a custom pipeline is included in the `src` folder and is named `custom_pipeline_example.py`. Example of a serialized pipeline is included in the root folder and is named `custom_pipeline_example.yaml`.
+Example of serializing a custom pipeline is included in the [`src`](./src) folder and is named [`custom_pipeline_example.py`](./src/custom_pipeline_example.py). Example of a serialized pipeline is included in the root folder and is named [`custom_pipeline_example.yml`](./custom_pipeline_example.yml).
 
 **How we ran the script:**
 
@@ -109,11 +109,41 @@ All three are available on Kaggle: [Facial Affect Dataset](https://www.kaggle.co
 
 ## Model
 
-TODO
+We decided to implement each ResNet model in Tensorflow and choose the best performing model as our final model. The models are based on the [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) paper by Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun (2015). The models are implemented in the [`src/resnets.py`](./src/resnets.py) file.
+
+We used the following ResNet models:
+
+- ResNet-18
+- ResNet-34
+- ResNet-50
+- ResNet-101
+- ResNet-152
+
+Each model is implemented as a function that follows this signature:
+
+```py
+def ResNetN(
+    output_units: int,
+    input_shape: Tuple[int, int, int],
+    normalize=False,
+    kernel_regularizer: Union[Regularizer, None] = None,
+    dropout_rate=0.0,
+) -> Model
+```
+
+where N in the function name is the number of layers in the model that should be replaced with 18, 34, 50, 101, or 152. The function takes the following parameters:
+
+- `output_units` - Number of output units (number of classes)
+- `input_shape` - Shape of the input images
+- `normalize` - Whether to normalize the input images to the range [0, 1] (default: `False`)
+- `kernel_regularizer` - Kernel regularizer of class `tf.keras.regularizers.Regularizer` (default: `None`)
+- `dropout_rate` - Dropout rate used after global average pooling (default: `0.0`)
+
+Models use the [Functional API](https://www.tensorflow.org/guide/keras/functional) of Keras under the hood which defines the model's structure as a directed acyclic graph of layers. The function returns a `tf.keras.Model` instance that needs to be compiled and trained.
 
 ## Training
 
-TODO
+Training has been logged using [Weights & Biases](https://wandb.ai/). The training notebook is ...
 
 ## Results
 
@@ -121,4 +151,6 @@ TODO
 
 ## References
 
-TODO
+[Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) by Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun (2015)
+
+[Tensorflow Docs](https://www.tensorflow.org/api_docs/python)
