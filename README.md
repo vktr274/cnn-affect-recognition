@@ -67,7 +67,7 @@ The script is universal and can be used for any dataset that has the same struct
 
 The script is available in the [`src/datasplit.py`](./src/datasplit.py) file. It can be run following this pattern:
 
-`python datasplit.py [-h] [--balance] [--output-path OUTPUT_PATH] [--train-split TRAIN_SPLIT] [--seed SEED] [--label-col LABEL_COL] [--filename-col FILENAME_COL] [--global-multiplier GLOBAL_MULTIPLIER] [--pipeline-yaml PIPELINE_YAML] path`
+`python datasplit.py [-h] [--balance-train] [--balance-test] [--output-path OUTPUT_PATH] [--train-split TRAIN_SPLIT] [--seed SEED] [--label-col LABEL_COL] [--filename-col FILENAME_COL] [--global-multiplier GLOBAL_MULTIPLIER] [--pipeline-yaml PIPELINE_YAML] path`
 
 Positional argument:
 
@@ -76,7 +76,8 @@ Positional argument:
 Options:
 
 - `-h`, `--help` - show help message and exit
-- `--balance` - Balance classes in training set and optionally perform global augmentation if `GLOBAL_MULTIPLIER` is greater than 1.0 (default: `False`)
+- `--balance-train` - Balance classes in training set and optionally perform global augmentation for the training set if `GLOBAL_MULTIPLIER` is greater than 1.0 (default: `False`)
+- `--balance-test` - Balance classes in created test set and optionally perform global augmentation for the test set if `GLOBAL_MULTIPLIER` is greater than 1.0 (default: `False`)
 - `--output OUTPUT` - Path to an empty output directory (default: `None` - overwrite input directory)
 - `--train-split TRAIN_SPLIT` - Train split ratio (default: `0.8`)
 - `--seed SEED` - Random seed (default: `None`)

@@ -1,5 +1,5 @@
 import sys
-from typing import Union
+from typing import Tuple, Union
 import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
@@ -115,7 +115,7 @@ def split_data(
     data_path: str,
     pipeline: A.Compose,
     train_split=0.8,
-    balance=False,
+    balance: Tuple[bool, bool] = (False, False),
     label_col="label",
     filename_col="filename",
     global_multiplier=1.0,
@@ -131,7 +131,7 @@ def split_data(
     :param df: DataFrame with labels and filenames.
     :param data_path: Path to data directory.
     :param train_split: Train split ratio.
-    :param balance: Whether to balance classes in training and test set.
+    :param balance: Whether to balance classes in training and test set in a tuple (balance_train, balance_test).
     :param label_col: Name of label column.
     :param filename_col: Name of filename column.
     :param global_multiplier: Global multiplier for class size.
@@ -143,7 +143,8 @@ def split_data(
     largest_class_size = 0
     largest_train_class_size = 0
 
-    if balance:
+    balance_train, balance_test = balance
+    if balance_test or balance_train:
         counts = df[label_col].value_counts()
         largest_class_size = counts.max()
         largest_train_class_size = int(np.ceil(largest_class_size * train_split))
@@ -175,21 +176,15 @@ def split_data(
             test_class_df, data_path, label_col=label_col, filename_col=filename_col
         )
 
-        if balance:
+        np.random.seed(seed)
+        if balance_train:
             multiplier_train = calculate_class_multiplier(
                 train_class_df,
                 largest_train_class_size,
                 global_multiplier=global_multiplier,
             )
-            multiplier_test = calculate_class_multiplier(
-                test_class_df,
-                largest_class_size - largest_train_class_size,
-                global_multiplier=global_multiplier,
-            )
             logging.info(f"Class {c}: multiplier_train = {multiplier_train}")
-            logging.info(f"Class {c}: multiplier_test = {multiplier_test}")
 
-            np.random.seed(seed)
             if multiplier_train > 1.0:
                 train_class_df = balance_class(
                     train_class_df,
@@ -204,6 +199,15 @@ def split_data(
                 logging.info(
                     f"Class {c}: augmented to {len(train_class_df)} train samples"
                 )
+
+        if balance_test:
+            multiplier_test = calculate_class_multiplier(
+                test_class_df,
+                largest_class_size - largest_train_class_size,
+                global_multiplier=global_multiplier,
+            )
+            logging.info(f"Class {c}: multiplier_test = {multiplier_test}")
+
             if multiplier_test > 1.0:
                 test_class_df = balance_class(
                     test_class_df,
@@ -228,13 +232,13 @@ def split_data(
     test_csv_path = os.path.join(data_path, "test.csv")
 
     logging.info(
-        f"Saving train DataFrame to {train_csv_path} with columns {label_col} and {filename_col}"
+        f"Saving train DataFrame to {train_csv_path} with columns '{label_col}' and '{filename_col}'"
     )
-    logging.info(
-        f"Saving test DataFrame to {test_csv_path} with columns {label_col} and {filename_col}"
-    )
-
     train_df.to_csv(train_csv_path, index=False)
+
+    logging.info(
+        f"Saving test DataFrame to {test_csv_path} with columns '{label_col}' and '{filename_col}'"
+    )
     test_df.to_csv(test_csv_path, index=False)
 
 
@@ -250,7 +254,7 @@ def load_dataframe(
     :return: DataFrame with labels and filenames.
     """
     logging.info(
-        f"Creating DataFrame of labels and filenames from {train_path} with columns {label_col} and {filename_col}"
+        f"Creating DataFrame of labels and filenames from {train_path} with columns '{label_col}' and '{filename_col}'"
     )
     df = pd.DataFrame(columns=[label_col, filename_col])
     for label in os.listdir(train_path):
@@ -329,9 +333,14 @@ def create_cli() -> ArgumentParser:
         help="Path to a directory that includes a train directory with the images in subdirectories named after the labels",
     )
     parser.add_argument(
-        "--balance",
+        "--balance-train",
         action="store_true",
-        help="Balance classes in training set and optionally perform global augmentation if GLOBAL_MULTIPLIER is set to greater than 1.0 (default: False)",
+        help="Balance classes in training set and optionally perform global augmentation for the training set if GLOBAL_MULTIPLIER is set to greater than 1.0 (default: False)",
+    )
+    parser.add_argument(
+        "--balance-test",
+        action="store_true",
+        help="Balance classes in created test set and optionally perform global augmentation for the test set if GLOBAL_MULTIPLIER is set to greater than 1.0 (default: False)",
     )
     parser.add_argument(
         "--output-path",
@@ -422,7 +431,7 @@ def main() -> None:
         path,
         pipeline,
         train_split=args.train_split,
-        balance=args.balance,
+        balance=(args.balance_train, args.balance_test),
         label_col=args.label_col,
         filename_col=args.filename_col,
         global_multiplier=args.global_multiplier,
