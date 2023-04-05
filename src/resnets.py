@@ -135,6 +135,7 @@ def ResNet(
     input_shape: Tuple[int, int, int],
     block_sizes: Tuple[int, int, int, int],
     net_size: str,
+    include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
@@ -246,8 +247,10 @@ def ResNet(
     y_out = GlobalAveragePooling2D()(y_out)
     if dropout_rate > 0.0:
         y_out = Dropout(dropout_rate)(y_out)
-    y_out = Dense(output_units, kernel_regularizer=kernel_regularizer)(y_out)
-    y_out = Softmax()(y_out)
+
+    if include_top:
+        y_out = Dense(output_units, kernel_regularizer=kernel_regularizer)(y_out)
+        y_out = Softmax()(y_out)
 
     return Model(inputs=x_in, outputs=y_out)
 
@@ -255,6 +258,7 @@ def ResNet(
 def ResNet18(
     output_units: int,
     input_shape: Tuple[int, int, int],
+    include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
@@ -275,6 +279,7 @@ def ResNet18(
         input_shape,
         (2, 2, 2, 2),
         "small",
+        include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         dropout_rate=dropout_rate,
@@ -284,6 +289,7 @@ def ResNet18(
 def ResNet34(
     output_units: int,
     input_shape: Tuple[int, int, int],
+    include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
@@ -304,6 +310,7 @@ def ResNet34(
         input_shape,
         (3, 4, 6, 3),
         "small",
+        include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         dropout_rate=dropout_rate,
@@ -313,6 +320,7 @@ def ResNet34(
 def ResNet50(
     output_units: int,
     input_shape: Tuple[int, int, int],
+    include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
@@ -333,6 +341,7 @@ def ResNet50(
         input_shape,
         (3, 4, 6, 3),
         "large",
+        include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         dropout_rate=dropout_rate,
@@ -342,6 +351,7 @@ def ResNet50(
 def ResNet101(
     output_units: int,
     input_shape: Tuple[int, int, int],
+    include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
@@ -362,6 +372,7 @@ def ResNet101(
         input_shape,
         (3, 4, 23, 3),
         "large",
+        include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         dropout_rate=dropout_rate,
@@ -371,6 +382,7 @@ def ResNet101(
 def ResNet152(
     output_units: int,
     input_shape: Tuple[int, int, int],
+    include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     dropout_rate=0.0,
@@ -391,6 +403,7 @@ def ResNet152(
         input_shape,
         (3, 8, 36, 3),
         "large",
+        include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         dropout_rate=dropout_rate,
@@ -409,8 +422,8 @@ def write_summary(model: Model, file_path: str) -> None:
 
 if __name__ == "__main__":
     # Summarize models to test implementation.
-    outputs = 8
-    input_shape = (96, 96, 3)
+    outputs = 1000
+    input_shape = (224, 224, 3)
     normalize = True
 
     model = ResNet18(outputs, input_shape, normalize=normalize)
