@@ -37,6 +37,7 @@ def ResidualBlockLarge(
     :param s: stride used when reducing the input tensor
     :param reduce: whether to reduce the input tensor
     :param kernel_regularizer: kernel regularizer
+    :param kernel_initializer: the kernel initializer to use
 
     :return: output tensor
     """
@@ -100,6 +101,8 @@ def ResidualBlockSmall(
     :param filters: number of filters in each layer
     :param s: stride used when reducing the input tensor
     :param reduce: whether to reduce the input tensor
+    :param kernel_regularizer: kernel regularizer
+    :param kernel_initializer: the kernel initializer to use
 
     :return: output tensor
     """
@@ -161,6 +164,7 @@ def ResNet(
     :param net_size: 'small' or 'large'
     :param normalize: whether to normalize the input
     :param kernel_regularizer: kernel regularizer
+    :param kernel_initializer: the kernel initializer to use
     :param dropout_rate: dropout rate
 
     :return: ResNet model
@@ -299,6 +303,7 @@ def ResNet18(
     :param input_shape: The shape of the input.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
+    :param kernel_initializer: The kernel initializer to use.
     :param dropout_rate: The dropout rate to use.
 
     :return: The model.
@@ -332,6 +337,7 @@ def ResNet34(
     :param input_shape: The shape of the input.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
+    :param kernel_initializer: The kernel initializer to use.
     :param dropout_rate: The dropout rate to use.
 
     :return: The model.
@@ -365,6 +371,7 @@ def ResNet50(
     :param input_shape: The shape of the input.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
+    :param kernel_initializer: The kernel initializer to use.
     :param dropout_rate: The dropout rate to use.
 
     :return: The model.
@@ -398,6 +405,7 @@ def ResNet101(
     :param input_shape: The shape of the input.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
+    :param kernel_initializer: The kernel initializer to use.
     :param dropout_rate: The dropout rate to use.
 
     :return: The model.
@@ -431,6 +439,7 @@ def ResNet152(
     :param input_shape: The shape of the input.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
+    :param kernel_initializer: The kernel initializer to use.
     :param dropout_rate: The dropout rate to use.
 
     :return: The model.
