@@ -126,6 +126,7 @@ def ResNetN(
     input_shape: Tuple[int, int, int],
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
+    kernel_initializer="he_uniform",
     dropout_rate=0.0,
 ) -> Model
 ```
@@ -136,6 +137,7 @@ where N in the function name is the number of layers in the model that should be
 - `input_shape` - Shape of the input images
 - `normalize` - Whether to normalize the input images to the range [0, 1] (default: `False`)
 - `kernel_regularizer` - Kernel regularizer of class `tf.keras.regularizers.Regularizer` (default: `None`)
+- `kernel_initializer` - Kernel initializer (default: `he_uniform`)
 - `dropout_rate` - Dropout rate used after global average pooling (default: `0.0`)
 
 Models use the [Functional API](https://www.tensorflow.org/guide/keras/functional) of Keras under the hood which defines the model's structure as a directed acyclic graph of layers. The function returns a `tf.keras.Model` instance that needs to be compiled and trained.
