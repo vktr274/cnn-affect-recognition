@@ -141,6 +141,16 @@ where N in the function name is the number of layers in the model that should be
 
 Models use the [Functional API](https://www.tensorflow.org/guide/keras/functional) of Keras under the hood which defines the model's structure as a directed acyclic graph of layers. The function returns a `tf.keras.Model` instance that needs to be compiled and trained.
 
+The implementation was tested by successfully creating each model and printing its summary to text files. We used a helper function to print model summaries to text files:
+
+```py
+def write_summary(model: Model, file_path: str) -> None:
+    with open(file_path, "w") as f:
+        model.summary(print_fn=lambda x: f.write(x + "\n"))
+```
+
+The text files are included in the root folder and are named [`resnet18.txt`](./resnet18.txt), [`resnet34.txt`](./resnet34.txt), [`resnet50.txt`](./resnet50.txt), [`resnet101.txt`](./resnet101.txt), and [`resnet152.txt`](./resnet152.txt).
+
 ## Training
 
 Training has been logged using [Weights & Biases](https://wandb.ai/). The training notebook is ...

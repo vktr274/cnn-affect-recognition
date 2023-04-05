@@ -398,10 +398,10 @@ def ResNet152(
 
 
 def write_summary(model: Model, file_path: str) -> None:
-    """Write a summary of the model to a JSON file.
+    """Write a summary of the model to a text file.
 
     :param model: The model to summarize.
-    :param file_path: The path to the JSON file to write.
+    :param file_path: The path to the text file to write.
     """
     with open(file_path, "w") as f:
         model.summary(print_fn=lambda x: f.write(x + "\n"))
