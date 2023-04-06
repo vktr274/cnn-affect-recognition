@@ -146,10 +146,10 @@ def ResidualBlockSmall(
 
 
 def ResNet(
-    output_units: int,
     input_shape: Tuple[int, int, int],
     block_sizes: Tuple[int, int, int, int],
     net_size: str,
+    output_units=1000,
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
@@ -160,10 +160,10 @@ def ResNet(
     """
     Create one of ResNet-18, ResNet-34, ResNet-50, ResNet-101, and ResNet-152
 
-    :param output_units: number of output units
     :param input_shape: input shape
     :param block_sizes: number of layers in each block
     :param net_size: 'small' or 'large'
+    :param output_units: number of output units
     :param include_top: whether to include the classifier
     :param normalize: whether to normalize the input
     :param kernel_regularizer: kernel regularizer
@@ -292,8 +292,8 @@ def ResNet(
 
 
 def ResNet18(
-    output_units: int,
     input_shape: Tuple[int, int, int],
+    output_units=1000,
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
@@ -304,8 +304,8 @@ def ResNet18(
     """
     Create a ResNet-18 model.
 
-    :param output_units: The number of output units.
     :param input_shape: The shape of the input.
+    :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
@@ -316,10 +316,10 @@ def ResNet18(
     :return: The model.
     """
     return ResNet(
-        output_units,
         input_shape,
         (2, 2, 2, 2),
         "small",
+        output_units=output_units,
         include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
@@ -330,8 +330,8 @@ def ResNet18(
 
 
 def ResNet34(
-    output_units: int,
     input_shape: Tuple[int, int, int],
+    output_units=1000,
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
@@ -342,8 +342,8 @@ def ResNet34(
     """
     Create a ResNet-34 model.
 
-    :param output_units: The number of output units.
     :param input_shape: The shape of the input.
+    :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
@@ -354,10 +354,10 @@ def ResNet34(
     :return: The model.
     """
     return ResNet(
-        output_units,
         input_shape,
         (3, 4, 6, 3),
         "small",
+        output_units=output_units,
         include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
@@ -368,8 +368,8 @@ def ResNet34(
 
 
 def ResNet50(
-    output_units: int,
     input_shape: Tuple[int, int, int],
+    output_units=1000,
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
@@ -380,8 +380,8 @@ def ResNet50(
     """
     Create a ResNet-50 model.
 
-    :param output_units: The number of output units.
     :param input_shape: The shape of the input.
+    :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
@@ -392,10 +392,10 @@ def ResNet50(
     :return: The model.
     """
     return ResNet(
-        output_units,
         input_shape,
         (3, 4, 6, 3),
         "large",
+        output_units=output_units,
         include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
@@ -406,8 +406,8 @@ def ResNet50(
 
 
 def ResNet101(
-    output_units: int,
     input_shape: Tuple[int, int, int],
+    output_units=1000,
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
@@ -418,8 +418,8 @@ def ResNet101(
     """
     Create a ResNet-101 model.
 
-    :param output_units: The number of output units.
     :param input_shape: The shape of the input.
+    :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
@@ -430,10 +430,10 @@ def ResNet101(
     :return: The model.
     """
     return ResNet(
-        output_units,
         input_shape,
         (3, 4, 23, 3),
         "large",
+        output_units=output_units,
         include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
@@ -444,8 +444,8 @@ def ResNet101(
 
 
 def ResNet152(
-    output_units: int,
     input_shape: Tuple[int, int, int],
+    output_units=1000,
     include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
@@ -456,8 +456,8 @@ def ResNet152(
     """
     Create a ResNet-152 model.
 
-    :param output_units: The number of output units.
     :param input_shape: The shape of the input.
+    :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
@@ -468,10 +468,10 @@ def ResNet152(
     :return: The model.
     """
     return ResNet(
-        output_units,
         input_shape,
         (3, 8, 36, 3),
         "large",
+        output_units=output_units,
         include_top=include_top,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
@@ -493,21 +493,20 @@ def write_summary(model: Model, file_path: str) -> None:
 
 if __name__ == "__main__":
     # Summarize models to test implementation.
-    outputs = 1000
     input_shape = (224, 224, 3)
     normalize = True
 
-    model = ResNet18(outputs, input_shape, normalize=normalize)
+    model = ResNet18(input_shape, normalize=normalize)
     write_summary(model, "resnet18.txt")
 
-    model = ResNet34(outputs, input_shape, normalize=normalize)
+    model = ResNet34(input_shape, normalize=normalize)
     write_summary(model, "resnet34.txt")
 
-    model = ResNet50(outputs, input_shape, normalize=normalize)
+    model = ResNet50(input_shape, normalize=normalize)
     write_summary(model, "resnet50.txt")
 
-    model = ResNet101(outputs, input_shape, normalize=normalize)
+    model = ResNet101(input_shape, normalize=normalize)
     write_summary(model, "resnet101.txt")
 
-    model = ResNet152(outputs, input_shape, normalize=normalize)
+    model = ResNet152(input_shape, normalize=normalize)
     write_summary(model, "resnet152.txt")
