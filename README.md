@@ -200,9 +200,17 @@ We also used a similar learning rate schedule as in the paper. Our scheduler was
 
 These hyperparameters were used for all ResNet models we implemented. As training data we used the unbalanced datasets first to get a baseline on how well the models perform. All models were trained on the dataset with original labels and the relabeled dataset so we could compare the effect of relabeling the dataset on the model performance.
 
-Training has been logged using [Weights & Biases](https://wandb.ai/). The training notebook is ...
+Training has been logged using [Weights & Biases](https://wandb.ai/). The training notebooks are available in the [`src`](./src) folder. The notebook [`resnet-selection-original-labels.ipynb`](./src/resnet-selection-original-labels.ipynb) contains the training of the models on the unbalanced dataset with original labels. The notebook [`resnet-selection-improved-labels.ipynb`](./src/resnet-selection-improved-labels.ipynb) contains the training of the models on the unbalanced dataset with improved labels.
 
-Our findings ...
+The report from training with the unbalanced dataset with original labels and without any augmentation is available on Weights & Biases [here](https://api.wandb.ai/links/nsiete23/5wrwkqey).
+
+The report from training with the unbalanced dataset with improved labels and without any augmentation is available on Weights & Biases [here](https://api.wandb.ai/links/nsiete23/cmp2nhvu).
+
+In both cases the ResNet-18 and ResNet-34 seem to perform the best even though every model struggled to learn anything. Only the training accuracy kept increasing while the validation accuracy reached a plateau over time. The smaller models reached this validation accuracy plateau earlier than the larger models. After reaching the plateau on ResNet-18 and ResNet-34 the models started to visibly overfit because of earlier plateauing. On the larger models, overfitting was not visible beacuse the validation loss kept decreasing. The interesting thing on the larger models is that while the validation accuracy on the largter kept raising less and less, the training accuracy kept increasing, and the validation and training loss kept decreasing rather smmoothly together. This doesn't indicate overfitting but rather very large bias towards the training data.
+
+After seeing the baseline results, we decided to continue using ResNet-18 not only because it performed relatively well compared to the other models, but also because it is the smallest model and therefore the fastest to train considering our time constraints.
+
+The next step was to try to improve the model performance by using the balanced dataset with improved labels. The balancing was done by oversampling the minority classes as described in the [Preprocessing](#preprocessing) section.
 
 ## Results
 
