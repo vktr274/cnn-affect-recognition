@@ -9,6 +9,8 @@ We used the [Facial Expressions Training Data](https://www.kaggle.com/datasets/n
 
 ## Preprocessing
 
+### Datasplit Script
+
 We created a Python script that splits the dataset into training and test sets by random sampling from the original dataset and optionally balances the dataset by augmenting classes smaller in size relative to the largest class. If balancing is enabled, it can also optionally perform global augmentation. Meaning that the number of images in each class can be increased by a global multiplier. The script also creates a CSV file with label to filename mappings for the training and test sets.
 
 The augmentation pipleine used it the script is created using the [Albumentations](https://albumentations.ai/) library. The pipeline is a composition of transformations that are applied to the images and is defined like this:
@@ -63,7 +65,7 @@ Besides the dataset, the script requires installation of required Python package
 
 The script is universal and can be used for any dataset that has the same structure (dataset with a train subdirectory with images in subdirectories named after the labels).
 
-### Running the Script
+### Running the Datasplit Script
 
 The script is available in the [`src/datasplit.py`](./src/datasplit.py) file. It can be run following this pattern:
 
@@ -92,7 +94,13 @@ The pipeline has to be an instance of [`albumentations.core.composition.Compose`
 
 Example of serializing a custom pipeline is included in the [`src`](./src) folder and is named [`custom_pipeline_example.py`](./src/custom_pipeline_example.py). Example of a serialized pipeline is included in the root folder and is named [`custom_pipeline_example.yml`](./custom_pipeline_example.yml).
 
-The original dataset also has a `labels.csv` file which includes improved labels by machine learning. We decided to create a script that relabels the dataset using the improved labels. The script is available in the [`src/relabel.py`](./src/relabel.py) file. It can be run following this pattern:
+### Relabeling the Dataset
+
+The original dataset also has a `labels.csv` file which includes improved labels by machine learning. We decided to create a script that relabels the dataset using the improved labels. The script is available in the [`src/relabel.py`](./src/relabel.py) file.
+
+### Running the Relabeling Script
+
+It can be run following this pattern:
 
 `python relabel.py [-h] [--output-path OUTPUT_PATH] [--label-csv] path`
 
@@ -108,7 +116,11 @@ Options:
 
 - `--label-csv LABEL_CSV` - Path to a CSV file with improved labels (default: `labels.csv` - use labels from `labels.csv`)
 
-**We ran the datasplit script for the original dataset and relabeled dataset like so:**
+### How we ran the scripts
+
+We ran the datasplit script for the original dataset and relabeled dataset with and without balancing the classes.
+
+The following commands were used to create the datasets:
 
 `python src/datasplit.py --seed 27 --output-path data_split data`
 
@@ -186,13 +198,11 @@ As a starting point we were inspired by Kaiming He et al. and their paper. They 
 
 We also used a similar learning rate schedule as in the paper. Our scheduler was set to monitor validation loss and reduce the learning rate by a factor of 0.1 when the validation loss did not improve for 5 epochs. We also used early stopping with a patience of 10 epochs and best weights restoration.
 
-These hyperparameters were used for all ResNet models we implemented. As training data we used the unbalanced dataset first to get a baseline on how well the models perform. We then chose the best performing model and trained it on the balanced dataset as well.
+These hyperparameters were used for all ResNet models we implemented. As training data we used the unbalanced datasets first to get a baseline on how well the models perform. All models were trained on the dataset with original labels and the relabeled dataset so we could compare the effect of relabeling the dataset on the model performance.
 
 Training has been logged using [Weights & Biases](https://wandb.ai/). The training notebook is ...
 
-To Be Continued...
-
-```py
+Our findings ...
 
 ## Results
 
