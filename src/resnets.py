@@ -18,6 +18,7 @@ from tensorflow.keras.layers import (
     BatchNormalization,
     ReLU,
     Softmax,
+    Flatten,
 )
 
 
@@ -153,6 +154,7 @@ def ResNet(
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
+    flatten=False,
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -162,9 +164,11 @@ def ResNet(
     :param input_shape: input shape
     :param block_sizes: number of layers in each block
     :param net_size: 'small' or 'large'
+    :param include_top: whether to include the classifier
     :param normalize: whether to normalize the input
     :param kernel_regularizer: kernel regularizer
     :param kernel_initializer: the kernel initializer to use
+    :param flatten: whether to flatten the output or use a global average pooling layer
     :param dropout_rate: dropout rate
 
     :return: ResNet model
@@ -272,7 +276,7 @@ def ResNet(
             )
         )
 
-    y_out = GlobalAveragePooling2D()(y_out)
+    y_out = Flatten()(y_out) if flatten else GlobalAveragePooling2D()(y_out)
     if dropout_rate > 0.0:
         y_out = Dropout(dropout_rate)(y_out)
 
@@ -294,6 +298,7 @@ def ResNet18(
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
+    flatten=False,
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -301,9 +306,11 @@ def ResNet18(
 
     :param output_units: The number of output units.
     :param input_shape: The shape of the input.
+    :param include_top: Whether to include the classifier.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
+    :param flatten: Whether to flatten the output or use a global average pooling layer.
     :param dropout_rate: The dropout rate to use.
 
     :return: The model.
@@ -317,6 +324,7 @@ def ResNet18(
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         kernel_initializer=kernel_initializer,
+        flatten=flatten,
         dropout_rate=dropout_rate,
     )
 
@@ -328,6 +336,7 @@ def ResNet34(
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
+    flatten=False,
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -335,9 +344,11 @@ def ResNet34(
 
     :param output_units: The number of output units.
     :param input_shape: The shape of the input.
+    :param include_top: Whether to include the classifier.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
+    :param flatten: Whether to flatten the output or use a global average pooling layer.
     :param dropout_rate: The dropout rate to use.
 
     :return: The model.
@@ -351,6 +362,7 @@ def ResNet34(
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         kernel_initializer=kernel_initializer,
+        flatten=flatten,
         dropout_rate=dropout_rate,
     )
 
@@ -362,6 +374,7 @@ def ResNet50(
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
+    flatten=False,
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -369,9 +382,11 @@ def ResNet50(
 
     :param output_units: The number of output units.
     :param input_shape: The shape of the input.
+    :param include_top: Whether to include the classifier.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
+    :param flatten: Whether to flatten the output or use a global average pooling layer.
     :param dropout_rate: The dropout rate to use.
 
     :return: The model.
@@ -385,6 +400,7 @@ def ResNet50(
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         kernel_initializer=kernel_initializer,
+        flatten=flatten,
         dropout_rate=dropout_rate,
     )
 
@@ -396,6 +412,7 @@ def ResNet101(
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
+    flatten=False,
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -403,9 +420,11 @@ def ResNet101(
 
     :param output_units: The number of output units.
     :param input_shape: The shape of the input.
+    :param include_top: Whether to include the classifier.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
+    :param flatten: Whether to flatten the output or use a global average pooling layer.
     :param dropout_rate: The dropout rate to use.
 
     :return: The model.
@@ -419,6 +438,7 @@ def ResNet101(
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         kernel_initializer=kernel_initializer,
+        flatten=flatten,
         dropout_rate=dropout_rate,
     )
 
@@ -430,6 +450,7 @@ def ResNet152(
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
+    flatten=False,
     dropout_rate=0.0,
 ) -> Model:
     """
@@ -437,9 +458,11 @@ def ResNet152(
 
     :param output_units: The number of output units.
     :param input_shape: The shape of the input.
+    :param include_top: Whether to include the classifier.
     :param normalize: Whether to normalize the input.
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
+    :param flatten: Whether to flatten the output or use a global average pooling layer.
     :param dropout_rate: The dropout rate to use.
 
     :return: The model.
@@ -453,6 +476,7 @@ def ResNet152(
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         kernel_initializer=kernel_initializer,
+        flatten=flatten,
         dropout_rate=dropout_rate,
     )
 

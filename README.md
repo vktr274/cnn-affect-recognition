@@ -227,6 +227,18 @@ We decided to try a much smaller learning rate of 0.000001 keeping the batch siz
 
 Next we tried a learning rate of 0.0000001 and kept the batch size. This learning rate is too small for the model to continue converging at an acceptable rate. After 100 epochs the training loss was 1.7903 and the validation loss was 1.9027 and the training accuracy was 0.3466 and the validation accuracy was 0.2814.
 
+We also tried a learning rate of 0.1 but the model heavily overfit after 14 epochs. Another try with a learning rate of 0.0001 and a batch size of 4 was also unsuccessful. After 4 epochs the training loss was 0.7182 and the validation loss was 1.8660.
+
+A batch size of 512 and a learning rate of 0.001 yielded even worse results and the model started overfitting after 5 epochs. The next attempt was a batch size of 32 and a learning rate of 0.00001 with images converted to grayscale with no success - we experienced another case of overfitting after 5 epochs.
+
+We next returned to RGB images, batch size of 64, and learning rate of 0.000001 but this time we didn't normalize the images. The progress was similar to the attempt with normalized images and same batch size and learning rate - so we stopped the training after 24 epochs seeing its trend.
+
+After no success with the Adam optimizer we decided to try SGD again, this time without momentum and without any L2 kernel regularization. We set the batch size to 64 and learning rate to 0.001. We saw the same pattern - training loss decreasing rapidly while validation loss lagged behind.
+
+Another attempt was using SGD with Nesterov momentum at 0.9, learning rate of 0.001, and batch size of 64. This time we used L2 kernel regularization at 0.001. The training resulted in the same pattern as before.
+
+#### ResNet-18 with a changed top
+
 ## Results
 
 TODO
