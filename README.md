@@ -162,23 +162,27 @@ Each model is implemented as a function that follows this signature:
 
 ```py
 def ResNetN(
-    output_units: int,
     input_shape: Tuple[int, int, int],
+    output_units=1000,
+    include_top=True,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
+    flatten=False,
     dropout_rate=0.0,
 ) -> Model
 ```
 
 where N in the function name is the number of layers in the model that should be replaced with 18, 34, 50, 101, or 152. The function takes the following parameters:
 
-- `output_units` - Number of output units (number of classes)
 - `input_shape` - Shape of the input images
+- `output_units` - Number of output units used in the last layer if `include_top` is `True` (default: `1000`)
+- `include_top` - Whether to include the network top (default: `True`)
 - `normalize` - Whether to normalize the input images to the range [0, 1] (default: `False`)
 - `kernel_regularizer` - Kernel regularizer of class `tf.keras.regularizers.Regularizer` (default: `None`)
 - `kernel_initializer` - Kernel initializer (default: `he_uniform`)
-- `dropout_rate` - Dropout rate used after global average pooling (default: `0.0`)
+- `flatten` - Whether to flatten the output of the last convolutional layer or use global average pooling (default: `False` - use global average pooling)
+- `dropout_rate` - Dropout rate used after global average pooling or flattening (default: `0.0`)
 
 Models use the [Functional API](https://www.tensorflow.org/guide/keras/functional) of Keras under the hood which defines the model's structure as a directed acyclic graph of layers. The function returns a `tf.keras.Model` instance that needs to be compiled and trained.
 
