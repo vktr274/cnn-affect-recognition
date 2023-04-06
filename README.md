@@ -220,7 +220,7 @@ In both cases the ResNet-18 and ResNet-34 seem to perform the best even though e
 
 ### ResNet-18 Training
 
-After seeing the baseline results, we decided to continue using ResNet-18 not only because it performed relatively well compared to the other models, but also because it is the smallest model and therefore the fastest to train considering our time constraints.
+After seeing the baseline results, we decided to continue using the smaller models not only because they performed relatively well, but also because they are the fastest to train considering our time constraints.
 
 The next step was to try to improve the model performance by using the balanced dataset with improved labels. The balancing was done by oversampling the minority classes as described in the [Preprocessing](#preprocessing) section.
 We switched from SGD with momentum to Adam. L2 regularization was omitted because according to Ilya Loshchilov and Frank Hutter it is not effective when using the Adam optimizer. Since Adam is an optimizer with adaptive learning rate, we also omitted the learning rate scheduler. We continued using early stopping with a patience of 10 epochs and best weights restoration.
