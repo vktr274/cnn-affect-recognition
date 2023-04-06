@@ -273,6 +273,8 @@ The model started overfitting after 15 epochs. We ended the training after the 2
 
 After the unsuccessful attempt with ResNet-18 we decided to try the same approach with ResNet-34. We used the same VGG16-like top as with ResNet-18 and the same optimizer and hyperparameters.
 
+The model started heavily overfitting after 12 epochs so we see no improvement over previous attempts. The training loss started at 2.057 and ended at 4.132 before early stopping at epoch 22.
+
 ## Results
 
 TODO
