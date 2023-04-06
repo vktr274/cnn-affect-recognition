@@ -261,6 +261,12 @@ top = Dense(len(classes), activation="softmax")(top)
 model = Model(inputs=model.input, outputs=top)
 ```
 
+The model started overfitting after 15 epochs. We ended the training after the 21st epoch on 0.6711 training loss and 1.9891 validation loss.
+
+#### ResNet-34 with a changed top
+
+After the unsuccessful attempt with ResNet-18 we decided to try the same approach with ResNet-34. We used the same VGG16-like top as with ResNet-18 and the same optimizer and hyperparameters.
+
 ## Results
 
 TODO
