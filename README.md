@@ -192,6 +192,10 @@ def write_summary(model: Model, file_path: str) -> None:
 
 The text files are included in the root folder and are named [`resnet18.txt`](./resnet18.txt), [`resnet34.txt`](./resnet34.txt), [`resnet50.txt`](./resnet50.txt), [`resnet101.txt`](./resnet101.txt), and [`resnet152.txt`](./resnet152.txt).
 
+## Training and Testing Environment
+
+We used Kaggle notebooks for model training and testing on a GPU - a Tesla P100. Training complex model like ResNets on a CPU would take a very long time so we didn't prepare a Docker image for CPU training and testing.
+
 ## Training
 
 As a starting point we were inspired by Kaiming He et al. and their paper. They used SGD with a learning rate of 0.1 and a momentum of 0.9. They also used weight decay of 0.0001 and a batch size of 256. We decided to use all but the batch size, which we set to 32. We note that instead of weight decay we used a kernel regularizer with an L2 norm of 0.0001, which according to Ilya Loshchilov and Frank Hutter ([Fixing Weight Decay Regularization in Adam](https://arxiv.org/pdf/1711.05101v2.pdf), 2018) is equivalent to weight decay when paired with SGD.
@@ -200,7 +204,7 @@ We also used a similar learning rate schedule as in the paper. Our scheduler was
 
 These hyperparameters were used for all ResNet models we implemented. As training data we used the unbalanced datasets first to get a baseline on how well the models perform. All models were trained on the dataset with original labels and the relabeled dataset so we could compare the effect of relabeling the dataset on the model performance.
 
-All images were normalized to the range [0, 1] using a `Rescaling` layer with a scale of 1.0/255.
+All images were normalized to the range [0, 1] using a `Rescaling` layer with a scale of 1.0/255. The training data was split into training and validation sets using a 80/20 split.
 
 Training has been logged using [Weights & Biases](https://wandb.ai/). The training notebooks are available in the [`src`](./src) folder. The notebook [`resnet-selection-original-labels.ipynb`](./src/resnet-selection-original-labels.ipynb) contains the training of the models on the unbalanced dataset with original labels. The notebook [`resnet-selection-improved-labels.ipynb`](./src/resnet-selection-improved-labels.ipynb) contains the training of the models on the unbalanced dataset with improved labels.
 
@@ -210,10 +214,18 @@ The report from training with the unbalanced dataset with improved labels and wi
 
 In both cases the ResNet-18 and ResNet-34 seem to perform the best even though every model struggled to learn anything. Only the training accuracy kept increasing while the validation accuracy reached a plateau over time. The smaller models reached this validation accuracy plateau earlier than the larger models. After reaching the plateau on ResNet-18 and ResNet-34 the models started to visibly overfit because of earlier plateauing. The larger models started overfitting too but it was not as visible on the Wandb validation loss graphs due to large validation loss at earlier epochs. After zooming in on the validation loss graphs we could see increasing validation loss on the larger models as well.
 
+### ResNet-18 Training
+
 After seeing the baseline results, we decided to continue using ResNet-18 not only because it performed relatively well compared to the other models, but also because it is the smallest model and therefore the fastest to train considering our time constraints.
 
 The next step was to try to improve the model performance by using the balanced dataset with improved labels. The balancing was done by oversampling the minority classes as described in the [Preprocessing](#preprocessing) section.
-We switched from SGD with momentum to Adam. L2 regularization was omitted because according to Ilya Loshchilov and Frank Hutter ([Fixing Weight Decay Regularization in Adam](https://arxiv.org/pdf/1711.05101v2.pdf), 2018) it is not effective when using the Adam optimizer. Since Adam is an optimizer with adaptive learning rate, we also omitted the learning rate scheduler.
+We switched from SGD with momentum to Adam. L2 regularization was omitted because according to Ilya Loshchilov and Frank Hutter it is not effective when using the Adam optimizer. Since Adam is an optimizer with adaptive learning rate, we also omitted the learning rate scheduler. We continued using early stopping with a patience of 10 epochs and best weights restoration.
+
+At first we chose 64 as the batch size and 0.0001 as the learning rate for the Adam optimizer. The training went very poorly so we ended the training on epoch 7 with a training loss of 0.0975 and a validation loss of 3.4805 which was higher than the starting validation loss of 1.7675.
+
+We decided to try a much smaller learning rate of 0.000001 keeping the batch size at 64. The model didn't overfit before we stopped the training after 50 epochs but the validation loss was still high (1.7125) and kept significantly diverging from the training loss (1.0769).
+
+Next we tried a learning rate of 0.00000001 and kept the batch size.
 
 ## Results
 
