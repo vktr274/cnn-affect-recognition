@@ -225,7 +225,7 @@ At first we chose 64 as the batch size and 0.0001 as the learning rate for the A
 
 We decided to try a much smaller learning rate of 0.000001 keeping the batch size at 64. The model didn't overfit before we stopped the training after 50 epochs but the validation loss was still high (1.7125) and kept significantly diverging from the training loss (1.0769).
 
-Next we tried a learning rate of 0.00000001 and kept the batch size.
+Next we tried a learning rate of 0.0000001 and kept the batch size. This learning rate is too small for the model to continue converging at an acceptable rate. After 100 epochs the training loss was 1.7903 and the validation loss was 1.9027 and the training accuracy was 0.3466 and the validation accuracy was 0.2814.
 
 ## Results
 
