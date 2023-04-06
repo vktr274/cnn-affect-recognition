@@ -244,6 +244,8 @@ We also tried to change the top of the ResNet-18 model by replacing the last `De
 The model was initialized like this:
 
 ```py
+import resnets as rn # our custom ResNet implementations
+
 model = rn.ResNet18(
     (image_size, image_size, channels),
     normalize=config["normalize"],
