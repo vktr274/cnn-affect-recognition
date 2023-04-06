@@ -14,15 +14,19 @@ def create_cli() -> ArgumentParser:
     :return: ArgumentParser object.
     """
     cli = ArgumentParser(description="Relabels the dataset to the new labels")
-    cli.add_argument("path", type=str, help="Path to the dataset directory")
     cli.add_argument(
-        "--output-path", type=str, help="Path to the output directory", required=True
+        "path",
+        type=str,
+        help="Path to a directory that includes a train directory with the images in subdirectories named after the labels",
+    )
+    cli.add_argument(
+        "--output-path", type=str, help="Path to an output directory", required=True
     )
     cli.add_argument(
         "--labels-csv",
         default="labels.csv",
         type=str,
-        help="Name of the labels csv including file extension",
+        help="Name of the labels csv including file extension (default: 'labels.csv')",
     )
     return cli
 

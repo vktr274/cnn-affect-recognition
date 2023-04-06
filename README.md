@@ -9,7 +9,7 @@ We used the [Facial Expressions Training Data](https://www.kaggle.com/datasets/n
 
 ## Preprocessing
 
-We created a Python script that splits the dataset into training and test sets and optionally balances the dataset by augmenting classes smaller in size relative to the largest class. If balancing is enabled, it can also optionally perform global augmentation. Meaning that the number of images in each class can be increased by a global multiplier. The script also creates a CSV file with label to filename mappings for the training and test sets.
+We created a Python script that splits the dataset into training and test sets by random sampling from the original dataset and optionally balances the dataset by augmenting classes smaller in size relative to the largest class. If balancing is enabled, it can also optionally perform global augmentation. Meaning that the number of images in each class can be increased by a global multiplier. The script also creates a CSV file with label to filename mappings for the training and test sets.
 
 The augmentation pipleine used it the script is created using the [Albumentations](https://albumentations.ai/) library. The pipeline is a composition of transformations that are applied to the images and is defined like this:
 
@@ -92,7 +92,23 @@ The pipeline has to be an instance of [`albumentations.core.composition.Compose`
 
 Example of serializing a custom pipeline is included in the [`src`](./src) folder and is named [`custom_pipeline_example.py`](./src/custom_pipeline_example.py). Example of a serialized pipeline is included in the root folder and is named [`custom_pipeline_example.yml`](./custom_pipeline_example.yml).
 
-**How we ran the script:**
+The original dataset also has a `labels.csv` file which includes improved labels by machine learning. We decided to create a script that relabels the dataset using the improved labels. The script is available in the [`src/relabel.py`](./src/relabel.py) file. It can be run following this pattern:
+
+`python relabel.py [-h] [--output-path OUTPUT_PATH] [--label-csv] path`
+
+Positional argument:
+
+- `path` - Path to a directory that includes a train directory with the images in subdirectories named after the labels, e.g. if `path` is `data`, then the images should be in `data/train/class1`, `data/train/class2`, etc.
+
+Options:
+
+- `-h`, `--help` - show help message and exit
+
+- `--output-path OUTPUT_PATH` - Path to an output directory (required)
+
+- `--label-csv LABEL_CSV` - Path to a CSV file with improved labels (default: `labels.csv` - use labels from `labels.csv`)
+
+**We ran the datasplit script for the original dataset and relabeled dataset like so:**
 
 `python src/datasplit.py --seed 27 --output-path data_split data`
 
@@ -105,6 +121,18 @@ The dataset is available on Kaggle: [Facial Affect Dataset Unbalanced](https://w
 The resulting dataset is balanced and contains 41,008 images in total. The training set contains 32,808 images (4,101 in each class) and the test set contains 8,200 images (1,025 in each class).
 
 The balanced dataset is available on Kaggle: [Facial Affect Dataset](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-dataset)
+
+`python src/datasplit.py --seed 27 --output-path data_relabeled_split data_relabeled`
+
+The resulting dataset is not balanced but only split into training and test sets and contains 28,664 images in total. The training set contains 22,930 images and the test set contains 5,734 images. The dataset is smaller due to the fact that the `relabel.py` script overwrites images with the same filename (issue in the script was discovered after the dataset was created).
+
+The dataset is available on Kaggle: [Facial Affect Dataset Relabeled Unbalanced](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-dataset-relabeled-unbalanced)
+
+`python src/datasplit.py --balance-train --balance-test --seed 27 --output-path data_relabeled_balanced_1x data_relabeled`
+
+The resulting dataset is not balanced but only split into training and test sets and contains 36,514 images in total. The training set contains 29,217 images and the test set contains 7,297 images. Again, the dataset is smaller due to the fact that the `relabel.py` script overwrites images with the same filename.
+
+The dataset is available on Kaggle: [Facial Affect Dataset Relabeled](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-data-relabeled)
 
 ## Model
 
