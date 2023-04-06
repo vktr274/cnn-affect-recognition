@@ -239,6 +239,28 @@ Another attempt was using SGD with Nesterov momentum at 0.9, learning rate of 0.
 
 #### ResNet-18 with a changed top
 
+We also tried to change the top of the ResNet-18 model by replacing the last `Dense` layer with a top similar to VGG16 as stated in [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) by Karen Simonyan and Andrew Zisserman (2015). Instead of a single `Dense` layer with 8 units we used 3 `Dense` layers with 4096, 4096, and 8 units respectively. We also added a `Dropout` layer with a rate of 0.5 after the first 2 `Dense` layers. Instead of a `GlobalAveragePooling2D` layer we used a `Flatten` layer before the first `Dense` layer. After the `Flatten` layer we used a `Dropout` layer with a rate of 0.2. The model was trained using the Adam optimizer with a learning rate of 0.00001 and a batch size of 64.
+
+The model was initialized like this:
+
+```py
+model = rn.ResNet18(
+    (image_size, image_size, channels),
+    normalize=config["normalize"],
+    include_top=False,
+    flatten=True,
+    dropout_rate=0.2
+)
+
+top = Dense(4096, activation="relu")(model.output)
+top = Dropout(0.5)(top)
+top = Dense(4096, activation="relu")(top)
+top = Dropout(0.5)(top)
+top = Dense(len(classes), activation="softmax")(top)
+
+model = Model(inputs=model.input, outputs=top)
+```
+
 ## Results
 
 TODO
@@ -248,5 +270,7 @@ TODO
 [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) by Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun (2015)
 
 [Fixing Weight Decay Regularization in Adam](https://arxiv.org/pdf/1711.05101v2.pdf) by Ilya Loshchilov and Frank Hutter (2018)
+
+[Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) by Karen Simonyan and Andrew Zisserman (2015)
 
 [Tensorflow Docs](https://www.tensorflow.org/api_docs/python)
