@@ -226,7 +226,7 @@ The next step was to try to improve the model performance by using the balanced 
 
 We switched from SGD with momentum to Adam. L2 regularization was omitted because according to Ilya Loshchilov and Frank Hutter it is not effective when using the Adam optimizer. Since Adam is an optimizer with adaptive learning rate, we also omitted the learning rate scheduler. We continued using early stopping with a patience of 10 epochs and best weights restoration.
 
-At first we chose 64 as the batch size and 0.0001 as the learning rate for the Adam optimizer. The training went very poorly so we ended the training on epoch 7 with a training loss of 0.0975 and a validation loss of 3.4805 which was higher than the starting validation loss of 1.7675.
+At first we chose 64 as the batch size and 0.0001 as the learning rate for the Adam optimizer with $\beta_1$ and $\beta_2$ being set to 0.9 and 0.999 respectively. The training went very poorly so we ended the training on epoch 7 with a training loss of 0.0975 and a validation loss of 3.4805 which was higher than the starting validation loss of 1.7675.
 
 We decided to try a much smaller learning rate of 0.000001 keeping the batch size at 64. The model didn't overfit before we stopped the training after 50 epochs but the validation loss was still high (1.7125) and kept significantly diverging from the training loss (1.0769).
 
@@ -244,7 +244,7 @@ Another attempt was using SGD with Nesterov momentum at 0.9, learning rate of 0.
 
 #### ResNet-18 with a changed top
 
-We also tried to change the top of the ResNet-18 model by replacing the last `Dense` layer with a top similar to VGG16 as stated in [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) by Karen Simonyan and Andrew Zisserman (2015). Instead of a single `Dense` layer with 8 units we used 3 `Dense` layers with 4096, 4096, and 8 units respectively. We also added a `Dropout` layer with a rate of 0.5 after the first 2 `Dense` layers. Instead of a `GlobalAveragePooling2D` layer we used a `Flatten` layer before the first `Dense` layer. After the `Flatten` layer we used a `Dropout` layer with a rate of 0.2. The model was trained using the Adam optimizer with a learning rate of 0.00001 and a batch size of 64. We trained the model on the same data - balanced dataset with improved labels.
+We also tried to change the top of the ResNet-18 model by replacing the last `Dense` layer with a top similar to VGG16 as stated in [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) by Karen Simonyan and Andrew Zisserman (2015). Instead of a single `Dense` layer with 8 units we used 3 `Dense` layers with 4096, 4096, and 8 units respectively. We also added a `Dropout` layer with a rate of 0.5 after the first 2 `Dense` layers. Instead of a `GlobalAveragePooling2D` layer we used a `Flatten` layer before the first `Dense` layer. After the `Flatten` layer we used a `Dropout` layer with a rate of 0.2. The model was trained using the Adam optimizer with a learning rate of 0.00001, a batch size of 64, $\beta_1$ of 0.9, and $\beta_2$ of 0.999. We trained the model on the same data - balanced dataset with improved labels.
 
 The model was initialized like this:
 
@@ -298,11 +298,11 @@ model.trainable = config["trainable"]
 
 outputs = model(x)
 
-top = Dense(units=2048, activation='relu')(outputs)
-top = Dropout(rate = 0.5)(top)
-top = Dense(units=512, activation='relu')(top)
-top = Dropout(rate = 0.2)(top)
-top = Dense(units=len(classes), activation='softmax')(top)
+top = Dense(2048, activation='relu')(outputs)
+top = Dropout(0.5)(top)
+top = Dense(512, activation='relu')(top)
+top = Dropout(0.2)(top)
+top = Dense(len(classes), activation='softmax')(top)
 
 model = Model(inputs=inputs, outputs=top)
 ```
@@ -313,7 +313,17 @@ We decided to increase the number of epochs to 150 with early stopping after 10 
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - 150 epochs](./graphs/resnet50_pretrained_150epochs.png)
 
-We had 2 options of continuing the training - either increase the learning rate or increase the the number of epochs. Based on previous observations, increasing the learning rate too much could lead to the training and validation loss diverging early with suboptimal results. We decided to increase the learning rate to 0.00005 and the number of epochs to 500.
+We had 2 options of continuing the training - either increase the learning rate or increase the the number of epochs. Based on previous observations, increasing the learning rate too much could lead to the training and validation loss diverging early with suboptimal results. We decided to increase the learning rate to 0.00005 and the number of epochs to 500. The training was stopped by the early stopping callback on epoch 250. There was no overfitting and the training and validation loss were decreasing until the end. No good results were achieved though - around epoch 50 the training and validation loss and accuracy started diverging and less than 50% validation accuracy was achieved.
+
+![ResNet50 From Tensorflow Pretrained On ImageNet - 250 epochs](./graphs/resnet50_pretrained_250epochs.png)
+
+In the next attempt we used AdamW with a learning rate of 0.00001, weight decay of 0.004, $\beta_1$ of 0.9, and $\beta_2$ of 0.999. The batch size stayed at 64. We didn't freeze ImageNet weights and we used the same top as before. Early stopping was used too with a patience of 10 epochs and best weights restoration. The model started overfitting heavily after 6 epochs. Freezing the ImageNet weights helped a lot as the optimizer is not readjusting the better weights learned on ImageNet. This training got us similar results to the previous attempt with SGD but the training and validation loss and accuracy started diverging much earlier at around epoch 15. The training ended by early stopping on epoch 54 where the training loss was 1.0551, the validation loss was 1.5726, the training accuracy was 0.6302, and the validation accuracy was 0.4417. The training progress can be seen in the graph below.
+
+![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW](./graphs/resnet50_pretrained_adamw.png)
+
+As our last attempts with ResNets we decided to try a larger augmented dataset that's 3 times larger than the previously used dataset. We also kept the ImageNet weights frozen and used AdamW with the same hyperparameters. The batch size stayed at 64. We used the same top as before. Early stopping was used too with a patience of 10 epochs and best weights restoration. This training yielded the best results so far. The previously observed issues are likely to be caused by not enough data as recognizing face expressions is a very difficult task.
+
+We can use an `ImageDataGenerator` to create more image variations on the fly.
 
 ## Results
 
