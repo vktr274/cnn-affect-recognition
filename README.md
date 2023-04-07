@@ -271,9 +271,11 @@ The model started overfitting after 15 epochs. We ended the training after the 2
 
 #### ResNet-34 with a changed top
 
-After the unsuccessful attempt with ResNet-18 we decided to try the same approach with ResNet-34. We used the same VGG16-like top as with ResNet-18 and the same optimizer and hyperparameters.
+After the unsuccessful attempt with ResNet-18 we decided to try the same approach with ResNet-34. We used the same VGG16-like top as with ResNet-18 and the same optimizer and hyperparameters - learning rate of 0.00001 and a batch size of 64. The model started heavily overfitting after 12 epochs so we see no improvement over previous attempts. The training loss started at 2.057 and ended at 4.132 before early stopping at epoch 22.
 
-The model started heavily overfitting after 12 epochs so we see no improvement over previous attempts. The training loss started at 2.057 and ended at 4.132 before early stopping at epoch 22.
+Another attempt was to use a different learning rate of 0.000001. Although the model didn't overfit, around epoch 50 the training loss started to diverge from the validation loss so the validation loss on epoch 100 was 1.7835 and the training loss was 1.3926. In case of accuracy the training accuracy was 0.4806 and the validation accuracy was 0.3428. We found the accuracy progress particularly interesting because training accuracy almost had a linear increase which can be seen in the graph below.
+
+[ResNet34 With Changed Top - Interesting result](./graphs/resnet34_changed_top.png)
 
 ## Results
 
