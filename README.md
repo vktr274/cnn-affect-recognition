@@ -275,7 +275,7 @@ After the unsuccessful attempt with ResNet-18 we decided to try the same approac
 
 Another attempt was to use a different learning rate of 0.000001. Although the model didn't overfit, around epoch 50 the training loss started to diverge from the validation loss so the validation loss on epoch 100 was 1.7835 and the training loss was 1.3926. In case of accuracy the training accuracy was 0.4806 and the validation accuracy was 0.3428. We found the accuracy progress particularly interesting because training accuracy almost had a linear increase which can be seen in the graph below.
 
-[ResNet34 With Changed Top - Interesting result](./graphs/resnet34_changed_top.png)
+![ResNet34 With Changed Top - Interesting result](./graphs/resnet34_changed_top.png)
 
 ## Results
 
