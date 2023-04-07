@@ -307,7 +307,13 @@ top = Dense(units=len(classes), activation='softmax')(top)
 model = Model(inputs=inputs, outputs=top)
 ```
 
-We used SGD with a momentum of 0.9, learning rate of 0.00001, and a batch size of 64. The `config["trainable"]` variable was set to `False` so the ImageNet weights were frozen. At first we set the number of epochs to 15 to see the direction of training - it was smooth so far and both training and validation loss were decreasing. We decided to increase the number of epochs to 150 with early stopping after 10 epochs without improvement and best weights restoration.
+We used SGD with a momentum of 0.9, learning rate of 0.00001, and a batch size of 64. The `config["trainable"]` variable was set to `False` so the ImageNet weights were frozen. At first we set the number of epochs to 15 to see the direction of training - it was smooth so far and both training and validation loss were decreasing.
+
+We decided to increase the number of epochs to 150 with early stopping after 10 epochs without improvement and best weights restoration. The training seemed very promising but convergence was very slow and this number of epochs was not enough to reach a good result (see graphs below).
+
+![ResNet50 From Tensorflow Pretrained On ImageNet - 150 epochs](./graphs/resnet50_pretrained_150epochs.png)
+
+We had 2 options of continuing the training - either increase the learning rate or increase the the number of epochs. Based on previous observations, increasing the learning rate too much could lead to the training and validation loss diverging early with suboptimal results. We decided to increase the learning rate to 0.00005 and the number of epochs to 500.
 
 ## Results
 
