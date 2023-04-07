@@ -223,6 +223,7 @@ In both cases the ResNet-18 and ResNet-34 seem to perform the best even though e
 After seeing the baseline results, we decided to continue using the smaller models not only because they performed relatively well, but also because they are the fastest to train considering our time constraints.
 
 The next step was to try to improve the model performance by using the balanced dataset with improved labels. The balancing was done by oversampling the minority classes as described in the [Preprocessing](#preprocessing) section.
+
 We switched from SGD with momentum to Adam. L2 regularization was omitted because according to Ilya Loshchilov and Frank Hutter it is not effective when using the Adam optimizer. Since Adam is an optimizer with adaptive learning rate, we also omitted the learning rate scheduler. We continued using early stopping with a patience of 10 epochs and best weights restoration.
 
 At first we chose 64 as the batch size and 0.0001 as the learning rate for the Adam optimizer. The training went very poorly so we ended the training on epoch 7 with a training loss of 0.0975 and a validation loss of 3.4805 which was higher than the starting validation loss of 1.7675.
@@ -243,7 +244,7 @@ Another attempt was using SGD with Nesterov momentum at 0.9, learning rate of 0.
 
 #### ResNet-18 with a changed top
 
-We also tried to change the top of the ResNet-18 model by replacing the last `Dense` layer with a top similar to VGG16 as stated in [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) by Karen Simonyan and Andrew Zisserman (2015). Instead of a single `Dense` layer with 8 units we used 3 `Dense` layers with 4096, 4096, and 8 units respectively. We also added a `Dropout` layer with a rate of 0.5 after the first 2 `Dense` layers. Instead of a `GlobalAveragePooling2D` layer we used a `Flatten` layer before the first `Dense` layer. After the `Flatten` layer we used a `Dropout` layer with a rate of 0.2. The model was trained using the Adam optimizer with a learning rate of 0.00001 and a batch size of 64.
+We also tried to change the top of the ResNet-18 model by replacing the last `Dense` layer with a top similar to VGG16 as stated in [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) by Karen Simonyan and Andrew Zisserman (2015). Instead of a single `Dense` layer with 8 units we used 3 `Dense` layers with 4096, 4096, and 8 units respectively. We also added a `Dropout` layer with a rate of 0.5 after the first 2 `Dense` layers. Instead of a `GlobalAveragePooling2D` layer we used a `Flatten` layer before the first `Dense` layer. After the `Flatten` layer we used a `Dropout` layer with a rate of 0.2. The model was trained using the Adam optimizer with a learning rate of 0.00001 and a batch size of 64. We trained the model on the same data - balanced dataset with improved labels.
 
 The model was initialized like this:
 
@@ -271,11 +272,42 @@ The model started overfitting after 15 epochs. We ended the training after the 2
 
 #### ResNet-34 with a changed top
 
-After the unsuccessful attempt with ResNet-18 we decided to try the same approach with ResNet-34. We used the same VGG16-like top as with ResNet-18 and the same optimizer and hyperparameters - learning rate of 0.00001 and a batch size of 64. The model started heavily overfitting after 12 epochs so we see no improvement over previous attempts. The training loss started at 2.057 and ended at 4.132 before early stopping at epoch 22.
+After the unsuccessful attempt with ResNet-18 we decided to try the same approach with ResNet-34 and the same balanced data with improved labels. We used the same VGG16-like top as with ResNet-18 and the same optimizer and hyperparameters - learning rate of 0.00001 and a batch size of 64. The model started heavily overfitting after 12 epochs so we see no improvement over previous attempts. The training loss started at 2.057 and ended at 4.132 before early stopping at epoch 22.
 
 Another attempt was to use a different learning rate of 0.000001. Although the model didn't overfit, around epoch 50 the training loss started to diverge from the validation loss so the validation loss on epoch 100 was 1.7835 and the training loss was 1.3926. In case of accuracy the training accuracy was 0.4806 and the validation accuracy was 0.3428. We found the accuracy progress particularly interesting because training accuracy almost had a linear increase which can be seen in the graph below.
 
 ![ResNet34 With Changed Top - Interesting result](./graphs/resnet34_changed_top.png)
+
+#### ResNet-50 from Tensorflow pretrained on ImageNet
+
+We decided to try using a ResNet-50 model pretrained on ImageNet that is available in the Tensorflow library. We used a similar top as the VGG16-like top we used with ResNet-18 and ResNet-34 but with less neurons, 2048 and 512 respectively. We also set a different dropout rate of 0.2 before the last `Dense` layer. Keras applications require the input to be preprocessed to match the ImageNet dataset. To do that Tensorflow provides a `preprocess_input` function that can be used to preprocess the input. The model was initialized like this:
+
+```py
+from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
+
+inputs = Input(shape=(image_size, image_size, channels))
+x = preprocess_input(inputs)
+
+model = ResNet50(
+    include_top=False,
+    weights='imagenet',
+    input_shape=(image_size, image_size, channels),
+    pooling="avg"
+)
+model.trainable = config["trainable"]
+
+outputs = model(x)
+
+top = Dense(units=2048, activation='relu')(outputs)
+top = Dropout(rate = 0.5)(top)
+top = Dense(units=512, activation='relu')(top)
+top = Dropout(rate = 0.2)(top)
+top = Dense(units=len(classes), activation='softmax')(top)
+
+model = Model(inputs=inputs, outputs=top)
+```
+
+We used SGD with a momentum of 0.9, learning rate of 0.00001, and a batch size of 64. The `config["trainable"]` variable was set to `False` so the ImageNet weights were frozen. At first we set the number of epochs to 15 to see the direction of training - it was smooth so far and both training and validation loss were decreasing. We decided to increase the number of epochs to 150 with early stopping after 10 epochs without improvement and best weights restoration.
 
 ## Results
 
