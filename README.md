@@ -325,7 +325,16 @@ As our last attempts with ResNets we decided to try a larger augmented dataset t
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 3x Dataset](./graphs/resnet50_pretrained_adamw_3x.png)
 
-The previously observed issues are likely to be caused by not enough data as recognizing face expressions is a very difficult task. We can use a `Sequential` model with preprocessing layers to create more image variations on the fly.
+The previously observed issues are likely to be caused by not enough data as recognizing face expressions is a very difficult task. We can use a `Sequential` model with preprocessing layers to create more image variations on the fly. We defined the following Sequential model:
+
+```py
+augmentation = Sequential([
+    RandomFlip(mode="horizontal"),
+    RandomRotation(factor=0.1),
+    RandomZoom(height_factor=0.15),
+    RandomTranslation(height_factor=0.15, width_factor=0.15)
+])
+```
 
 ## Results
 
