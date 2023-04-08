@@ -171,7 +171,7 @@ def ResNet(
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
-    :param dropout_rate: Dropout rate.
+    :param dropout_rate: Dropout rate after the global average pooling layer or the flatten layer.
 
     :return: ResNet model
     """
@@ -318,7 +318,7 @@ def ResNet18(
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
-    :param dropout_rate: The dropout rate to use.
+    :param dropout_rate: Dropout rate after the global average pooling layer or the flatten layer.
 
     :return: The model.
     """
@@ -359,7 +359,7 @@ def ResNet34(
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
-    :param dropout_rate: The dropout rate to use.
+    :param dropout_rate: Dropout rate after the global average pooling layer or the flatten layer.
 
     :return: The model.
     """
@@ -400,7 +400,7 @@ def ResNet50(
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
-    :param dropout_rate: The dropout rate to use.
+    :param dropout_rate: Dropout rate after the global average pooling layer or the flatten layer.
 
     :return: The model.
     """
@@ -441,7 +441,7 @@ def ResNet101(
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
-    :param dropout_rate: The dropout rate to use.
+    :param dropout_rate: Dropout rate after the global average pooling layer or the flatten layer.
 
     :return: The model.
     """
@@ -482,7 +482,7 @@ def ResNet152(
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
-    :param dropout_rate: The dropout rate to use.
+    :param dropout_rate: Dropout rate after the global average pooling layer or the flatten layer.
 
     :return: The model.
     """
