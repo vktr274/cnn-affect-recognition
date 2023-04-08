@@ -166,7 +166,7 @@ def ResNet(
     :param net_size: Size of ResNet 'small' for ResNet-18 and ResNet-34, 'large' for ResNet-50, ResNet-101, and ResNet-152.
     :param output_units: Number of output units
     :param include_top: Whether to include the classifier.
-    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
@@ -313,7 +313,7 @@ def ResNet18(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
-    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
@@ -354,7 +354,7 @@ def ResNet34(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
-    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
@@ -395,7 +395,7 @@ def ResNet50(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
-    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
@@ -436,7 +436,7 @@ def ResNet101(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
-    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
@@ -477,7 +477,7 @@ def ResNet152(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
-    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
