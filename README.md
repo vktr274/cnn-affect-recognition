@@ -222,7 +222,7 @@ In both cases the ResNet-18 and ResNet-34 seem to perform the best even though e
 
 After seeing the baseline results, we decided to continue using the smaller models not only because they performed relatively well, but also because they are the fastest to train considering our time constraints.
 
-The next step was to try to improve the model performance by using the balanced dataset with improved labels. The balancing was done by oversampling the minority classes as described in the [Preprocessing](#preprocessing) section.
+The next step was to try to improve the model performance by using the smaller balanced dataset with improved labels. The balancing was done by oversampling the minority classes as described in the [Preprocessing](#preprocessing) section.
 
 We switched from SGD with momentum to Adam. L2 regularization was omitted because according to Ilya Loshchilov and Frank Hutter it is not effective when using the Adam optimizer. Since Adam is an optimizer with adaptive learning rate, we also omitted the learning rate scheduler. We continued using early stopping with a patience of 10 epochs and best weights restoration.
 
@@ -321,11 +321,11 @@ In the next attempt we used AdamW with a learning rate of 0.00001, weight decay 
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW](./graphs/resnet50_pretrained_adamw.png)
 
-As our last attempts with ResNets we decided to try a larger augmented dataset that's 3 times larger than the previously used dataset. We also kept the ImageNet weights frozen and used AdamW with the same hyperparameters. The batch size stayed at 64. We used the same top as before. Early stopping was used too with a patience of 10 epochs and best weights restoration. This training yielded the best results so far. The training ended by early stopping on epoch 80 where the training loss was 0.4867, the validation loss was 1.2748, the training accuracy was 0.8315, and the validation accuracy was 0.5926. The test accuracy was still very low though - only 0.3868. The training progress can be seen in the graph below.
+As our last attempts with ResNets we decided to try a larger augmented dataset with improved labels that's 3 times larger than the previously used dataset. We also kept the ImageNet weights frozen and used AdamW with the same hyperparameters. The batch size stayed at 64. We used the same top as before. Early stopping was used too with a patience of 10 epochs and best weights restoration. This training yielded the best results so far. The training ended by early stopping on epoch 80 where the training loss was 0.4867, the validation loss was 1.2748, the training accuracy was 0.8315, and the validation accuracy was 0.5926. The test accuracy was still very low though - only 0.3868. The training progress can be seen in the graph below.
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 3x Dataset](./graphs/resnet50_pretrained_adamw_3x.png)
 
-The previously observed issues are likely to be caused by not enough data as recognizing face expressions is a very difficult task. We can use a `Sequential` model with preprocessing layers to create more image variations on the fly. We defined the following Sequential model:
+Based on the last training the previously observed issues are likely to be caused by not enough data as recognizing face expressions is a very difficult task. We can use a `Sequential` model with preprocessing layers to create more image variations on the fly. We defined the following Sequential model:
 
 ```py
 augmentation = Sequential([
@@ -340,9 +340,9 @@ We used AdamW and the same hyperparameters as before. After 11h 48m the training
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 3x Dataset - Augmented](./graphs/resnet50_crashed_training_3x_plus_aug.png)
 
-Next we tried the smaller dataset with the same Sequential model for on-the-fly augmentations so the training would be faster since there is less data that needs to be augmented during training. We continued using AdamW and the same hyperparameters as before.
+Next we tried switching back to the smaller dataset with improved labels and the same Sequential model for on-the-fly augmentations so the training would be faster since there is less data that needs to be augmented during training. We continued using AdamW and the same hyperparameters as before.
 
-We also tried our implementation of the ResNet-18 model with the 3x dataset and on-the-fly augmentations.
+We also tried our implementation of the ResNet-18 model with the larger dataset with improved labels and on-the-fly augmentations.
 
 ## Results
 
