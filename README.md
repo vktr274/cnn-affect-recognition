@@ -336,6 +336,10 @@ augmentation = Sequential([
 ])
 ```
 
+We used AdamW and the same hyperparameters as before. After 11h 48m the training unfortunately crashed. The training looked promising until then. The following graph shows the training progress before the crash.
+
+![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 3x Dataset - Augmented](./graphs/resnet50_crashed_training_3x_plus_aug.png)
+
 ## Results
 
 TODO
