@@ -161,11 +161,11 @@ We used the following ResNet models:
 Each model is implemented as a function that follows this signature:
 
 ```py
-def ResNet18(
+def ResNetN(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
-    after_input: Union[Model, None] = None,
+    after_input: Union[Sequential, Layer, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -179,7 +179,7 @@ where N in the function name is the number of layers in the model that should be
 - `input_shape` - Shape of the input images
 - `output_units` - Number of output units used in the last layer if `include_top` is `True` (default: `1000`)
 - `include_top` - Whether to include the network top after global average pooling or the flatten layer (default: `True`)
-- `after_input` -Custom layers to add after the input like preprocessing layers as a Keras model of class `tf.keras.Model` (default: `None` - no custom layers)
+- `after_input` - Custom layers to add after the input like preprocessing layers as a Keras model of class `tf.keras.Sequential` or as a single layer of class `tf.keras.layers.Layer` (default: `None` - no custom layers)
 - `normalize` - Whether to normalize the input images to the range [0, 1] (default: `False`)
 - `kernel_regularizer` - Kernel regularizer of class `tf.keras.regularizers.Regularizer` (default: `None`)
 - `kernel_initializer` - Kernel initializer (default: `he_uniform`)
@@ -349,10 +349,6 @@ Next we tried switching back to the smaller dataset with improved labels and the
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 1x Dataset - Augmented](./graphs/resnet50_training_1x_plus_aug.png)
 
 The notebook with the code for the last attempt with this model can be found in the [`src`](./src/) directory as [`resnet-50-imagenet-affect-better-labels-balanced.ipynb`](./src/resnet-50-imagenet-affect-better-labels-balanced.ipynb).
-
-#### ResNet-18 with the larger dataset with improved labels and on-the-fly augmentations
-
-We also tried our implementation of the ResNet-18 model with the larger dataset with improved labels and on-the-fly augmentations.
 
 ## Results
 
