@@ -280,6 +280,8 @@ Another attempt was to use a different learning rate of 0.000001. Although the m
 
 ![ResNet34 With Changed Top - Interesting result](./graphs/resnet34_changed_top.png)
 
+The notebook for the last experiment in this series of attempts with ResNet-18 and ResNet-34 can be found in the [`src`] directory as [`resnet-34-affect-better-labels-balanced.ipynb`](./src/resnet-34-affect-better-labels-balanced.ipynb).
+
 #### ResNet-50 from Tensorflow pretrained on ImageNet
 
 We decided to try using a ResNet-50 model pretrained on ImageNet that is available in the Tensorflow library. We used a similar top as the VGG16-like top we used with ResNet-18 and ResNet-34 but with less neurons, 2048 and 512 respectively. We also set a different dropout rate of 0.2 before the last `Dense` layer. Keras applications require the input to be preprocessed to match the ImageNet dataset. To do that Tensorflow provides a `preprocess_input` function that can be used to preprocess the input. The model was initialized like this:
@@ -342,7 +344,13 @@ We used AdamW and the same hyperparameters as before. After 11h 48m the training
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 3x Dataset - Augmented](./graphs/resnet50_crashed_training_3x_plus_aug.png)
 
-Next we tried switching back to the smaller dataset with improved labels and the same Sequential model for on-the-fly augmentations so the training would be faster since there is less data that needs to be augmented during training. We continued using AdamW and the same hyperparameters as before.
+Next we tried switching back to the smaller dataset with improved labels and the same Sequential model for on-the-fly augmentations so the training would be faster since there is less data that needs to be augmented during training. We continued using AdamW and the same hyperparameters as before. The training ended by early stopping on epoch 111 with a training loss of 1.5212, a validation loss of 1.6414, a training accuracy of 0.4377, and a validation accuracy of 0.3989. The test accuracy was 0.3884. The training progress can be seen in the graph below.
+
+![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 1x Dataset - Augmented](./graphs/resnet50_training_1x_plus_aug.png)
+
+The notebook with the code for the last attempt with this model can be found in the [`src`](./src/) directory as [`resnet-50-imagenet-affect-better-labels-balanced.ipynb`](./src/resnet-50-imagenet-affect-better-labels-balanced.ipynb).
+
+#### ResNet-18 with the larger dataset with improved labels and on-the-fly augmentations
 
 We also tried our implementation of the ResNet-18 model with the larger dataset with improved labels and on-the-fly augmentations.
 
