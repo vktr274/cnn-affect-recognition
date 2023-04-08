@@ -178,11 +178,12 @@ def ResNet(
     x_in = Input(shape=input_shape)
     y_out = x_in
 
+    if normalize:
+        y_out = Rescaling(scale=1.0 / 255)(y_out)
+
     if after_input is not None:
         y_out = after_input(y_out)
 
-    if normalize:
-        y_out = Rescaling(scale=1.0 / 255)(y_out)
     y_out = Conv2D(
         64,
         kernel_size=(7, 7),
