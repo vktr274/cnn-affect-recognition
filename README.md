@@ -280,7 +280,7 @@ Another attempt was to use a different learning rate of 0.000001. Although the m
 
 ![ResNet34 With Changed Top - Interesting result](./graphs/resnet34_changed_top.png)
 
-The notebook for the last experiment in this series of attempts with ResNet-18 and ResNet-34 can be found in the [`src`] directory as [`resnet-34-affect-better-labels-balanced.ipynb`](./src/resnet-34-affect-better-labels-balanced.ipynb).
+The notebook for the last experiment in this series of attempts with ResNet-18 and ResNet-34 can be found in the [`src`](./src/) directory as [`resnet-34-affect-better-labels-balanced.ipynb`](./src/resnet-34-affect-better-labels-balanced.ipynb).
 
 #### ResNet-50 from Tensorflow pretrained on ImageNet
 
