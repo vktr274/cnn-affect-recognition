@@ -5,7 +5,7 @@
 
 from typing import Tuple, Union
 from tensorflow.keras import Input
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.regularizers import Regularizer
 from tensorflow.keras.layers import (
     Dropout,
@@ -19,6 +19,7 @@ from tensorflow.keras.layers import (
     ReLU,
     Softmax,
     Flatten,
+    Layer,
 )
 
 
@@ -151,7 +152,7 @@ def ResNet(
     net_size: str,
     output_units=1000,
     include_top=True,
-    after_input: Union[Model, None] = None,
+    after_input: Union[Sequential, Layer, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -166,7 +167,7 @@ def ResNet(
     :param net_size: Size of ResNet 'small' for ResNet-18 and ResNet-34, 'large' for ResNet-50, ResNet-101, and ResNet-152.
     :param output_units: Number of output units.
     :param include_top: Whether to include the network top after global average pooling or the flatten layer.
-    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Sequential model or a single layer.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
@@ -301,7 +302,7 @@ def ResNet18(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
-    after_input: Union[Model, None] = None,
+    after_input: Union[Sequential, Layer, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -314,7 +315,7 @@ def ResNet18(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the network top after global average pooling or the flatten layer.
-    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Sequential model or a single layer.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
@@ -342,7 +343,7 @@ def ResNet34(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
-    after_input: Union[Model, None] = None,
+    after_input: Union[Sequential, Layer, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -355,7 +356,7 @@ def ResNet34(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the network top after global average pooling or the flatten layer.
-    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Sequential model or a single layer.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
@@ -383,7 +384,7 @@ def ResNet50(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
-    after_input: Union[Model, None] = None,
+    after_input: Union[Sequential, Layer, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -396,7 +397,7 @@ def ResNet50(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the network top after global average pooling or the flatten layer.
-    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Sequential model or a single layer.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
@@ -424,7 +425,7 @@ def ResNet101(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
-    after_input: Union[Model, None] = None,
+    after_input: Union[Sequential, Layer, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -437,7 +438,7 @@ def ResNet101(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the network top after global average pooling or the flatten layer.
-    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Sequential model or a single layer.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
@@ -465,7 +466,7 @@ def ResNet152(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
-    after_input: Union[Model, None] = None,
+    after_input: Union[Sequential, Layer, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -478,7 +479,7 @@ def ResNet152(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the network top after global average pooling or the flatten layer.
-    :param after_input: Custom layers to add after the input like preprocessing layers as a Keras model.
+    :param after_input: Custom layers to add after the input like preprocessing layers as a Sequential model or a single layer.
     :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
