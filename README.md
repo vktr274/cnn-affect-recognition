@@ -120,31 +120,31 @@ Options:
 
 We ran the datasplit script for the original dataset and relabeled dataset with and without balancing the classes.
 
-The following commands were used to create the datasets:
+**The following commands were used to create the dataset wihout balancing the classes:**
 
 `python src/datasplit.py --seed 27 --output-path data_split data`
 
-The resulting dataset is not balanced but only split into training and test sets and contains 29,042 images in total. The training set contains 23,234 images and the test set contains 5,808 images.
+The resulting dataset is not balanced but only split into training and test sets and contains 29,042 images in total. The training set contains 23,234 images and the test set contains 5,808 images. The images use their original labels.
 
 The dataset is available on Kaggle: [Facial Affect Dataset Unbalanced](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-dataset-unbalanced)
 
-`python src/datasplit.py --balance-train --balance-test --seed 27 --output-path data_balanced_1x data`
-
-The resulting dataset is balanced and contains 41,008 images in total. The training set contains 32,808 images (4,101 in each class) and the test set contains 8,200 images (1,025 in each class).
-
-The balanced dataset is available on Kaggle: [Facial Affect Dataset](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-dataset)
-
 `python src/datasplit.py --seed 27 --output-path data_relabeled_split data_relabeled`
 
-The resulting dataset is not balanced but only split into training and test sets and contains 28,664 images in total. The training set contains 22,930 images and the test set contains 5,734 images. The dataset is smaller due to the fact that the `relabel.py` script overwrites images with the same filename (issue in the script was discovered after the dataset was created).
+The resulting dataset is not balanced but only split into training and test sets and contains 28,664 images in total. The training set contains 22,930 images and the test set contains 5,734 images. The images use the improved labels. The dataset is smaller due to the fact that the `relabel.py` script overwrites images with the same filename (issue in the script was discovered after the dataset was created).
 
 The dataset is available on Kaggle: [Facial Affect Dataset Relabeled Unbalanced](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-dataset-relabeled-unbalanced)
 
+**The following commands were used to create the datasets with balancing the classes:**
+
 `python src/datasplit.py --balance-train --balance-test --seed 27 --output-path data_relabeled_balanced_1x data_relabeled`
 
-The resulting dataset is not balanced but only split into training and test sets and contains 36,514 images in total. The training set contains 29,217 images and the test set contains 7,297 images. Again, the dataset is smaller due to the fact that the `relabel.py` script overwrites images with the same filename.
+The resulting dataset is split into training and test sets and is balanced. It contains 36,514 images in total. The training set contains 29,217 images (~3,652 in each class) and the test set contains 7,297 images (~912 in each class). The images use the improved labels. Again, the dataset is smaller due to the fact that the `relabel.py` script overwrites images with the same filename.
 
-The dataset is available on Kaggle: [Facial Affect Dataset Relabeled](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-data-relabeled)
+`python src/datasplit.py --balance-train --balance-test --seed 27 --global-multiplier 3.0 --output-path data_relabeled_balanced_3x data_relabeled`
+
+The resulting dataset is split into training and test sets and is balanced. It contains 109,536 images in total. The training set contains 87,648 images (10,956 in each class) and the test set contains 21,888 images (~2,736 in each class). The images use the improved labels. The same issue with less images applies as in the previous case.
+
+Both datasets are available on Kaggle as `data_relabeled_balanced_1x` and `data_relabeled_balanced_3x`: [Facial Affect Dataset Relabeled](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-data-relabeled)
 
 ## Model
 
