@@ -210,7 +210,7 @@ These hyperparameters were used for all ResNet models we implemented. As trainin
 
 All images were normalized to the range [0, 1] using a `Rescaling` layer with a scale of 1.0/255. The training data was split into training and validation sets using a 80/20 split.
 
-Training has been logged using [Weights & Biases](https://wandb.ai/). The training notebooks are available in the [`src`](./src) folder. The notebook [`resnet-selection-original-labels.ipynb`](./src/resnet-selection-original-labels.ipynb) contains the training of the models on the unbalanced dataset with original labels. The notebook [`resnet-selection-improved-labels.ipynb`](./src/resnet-selection-improved-labels.ipynb) contains the training of the models on the unbalanced dataset with improved labels.
+Training has been logged using [Weights & Biases](https://wandb.ai/). The training notebooks are available in the [`src`](./src) folder. The notebook [`resnet-selection-original-labels.ipynb`](./src/resnet-selection-original-labels.ipynb) contains the training of the models on the unbalanced dataset with original labels. The notebook [`resnet-selection-improved-labels.ipynb`](./src/resnet-selection-improved-labels.ipynb) contains the training of the models on the unbalanced dataset with improved labels. Please note that both of these notebooks were written prior breaking changes in our ResNet implementation and the notebooks are not up to date with the current implementation.
 
 The report from training with the unbalanced dataset with original labels and without any augmentation is available on Weights & Biases [here](https://api.wandb.ai/links/nsiete23/5wrwkqey).
 
@@ -340,7 +340,9 @@ We used AdamW and the same hyperparameters as before. After 11h 48m the training
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 3x Dataset - Augmented](./graphs/resnet50_crashed_training_3x_plus_aug.png)
 
-Next we tried the smaller dataset with the same Sequential model for on-the-fly augmentations so the training would be faster.
+Next we tried the smaller dataset with the same Sequential model for on-the-fly augmentations so the training would be faster since there is less data that needs to be augmented during training. We continued using AdamW and the same hyperparameters as before.
+
+We also tried our implementation of the ResNet-18 model with the 3x dataset and on-the-fly augmentations.
 
 ## Results
 
