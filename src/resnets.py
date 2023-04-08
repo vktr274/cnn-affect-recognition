@@ -151,6 +151,7 @@ def ResNet(
     net_size: str,
     output_units=1000,
     include_top=True,
+    after_input: Union[Model, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -160,21 +161,25 @@ def ResNet(
     """
     Create one of ResNet-18, ResNet-34, ResNet-50, ResNet-101, and ResNet-152
 
-    :param input_shape: input shape
-    :param block_sizes: number of layers in each block
-    :param net_size: 'small' or 'large'
-    :param output_units: number of output units
-    :param include_top: whether to include the classifier
-    :param normalize: whether to normalize the input
-    :param kernel_regularizer: kernel regularizer
-    :param kernel_initializer: the kernel initializer to use
-    :param flatten: whether to flatten the output or use a global average pooling layer
-    :param dropout_rate: dropout rate
+    :param input_shape: Input shape.
+    :param block_sizes: Number of layers in each block.
+    :param net_size: Size of ResNet 'small' for ResNet-18 and ResNet-34, 'large' for ResNet-50, ResNet-101, and ResNet-152.
+    :param output_units: Number of output units
+    :param include_top: Whether to include the classifier.
+    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param normalize: Whether to normalize the inputs to [0, 1].
+    :param kernel_regularizer: The kernel regularizer to use.
+    :param kernel_initializer: The kernel initializer to use.
+    :param flatten: Whether to flatten the output or use a global average pooling layer.
+    :param dropout_rate: Dropout rate.
 
     :return: ResNet model
     """
     x_in = Input(shape=input_shape)
     y_out = x_in
+
+    if after_input is not None:
+        y_out = after_input(y_out)
 
     if normalize:
         y_out = Rescaling(scale=1.0 / 255)(y_out)
@@ -295,6 +300,7 @@ def ResNet18(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
+    after_input: Union[Model, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -307,7 +313,8 @@ def ResNet18(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
-    :param normalize: Whether to normalize the input.
+    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
@@ -321,6 +328,7 @@ def ResNet18(
         "small",
         output_units=output_units,
         include_top=include_top,
+        after_input=after_input,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         kernel_initializer=kernel_initializer,
@@ -333,6 +341,7 @@ def ResNet34(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
+    after_input: Union[Model, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -345,7 +354,8 @@ def ResNet34(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
-    :param normalize: Whether to normalize the input.
+    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
@@ -359,6 +369,7 @@ def ResNet34(
         "small",
         output_units=output_units,
         include_top=include_top,
+        after_input=after_input,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         kernel_initializer=kernel_initializer,
@@ -371,6 +382,7 @@ def ResNet50(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
+    after_input: Union[Model, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -383,7 +395,8 @@ def ResNet50(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
-    :param normalize: Whether to normalize the input.
+    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
@@ -397,6 +410,7 @@ def ResNet50(
         "large",
         output_units=output_units,
         include_top=include_top,
+        after_input=after_input,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         kernel_initializer=kernel_initializer,
@@ -409,6 +423,7 @@ def ResNet101(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
+    after_input: Union[Model, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -421,7 +436,8 @@ def ResNet101(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
-    :param normalize: Whether to normalize the input.
+    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
@@ -435,6 +451,7 @@ def ResNet101(
         "large",
         output_units=output_units,
         include_top=include_top,
+        after_input=after_input,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         kernel_initializer=kernel_initializer,
@@ -447,6 +464,7 @@ def ResNet152(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
+    after_input: Union[Model, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -459,7 +477,8 @@ def ResNet152(
     :param input_shape: The shape of the input.
     :param output_units: The number of output units.
     :param include_top: Whether to include the classifier.
-    :param normalize: Whether to normalize the input.
+    :param after_input: Custom layers to add after the input like preprocessing layers.
+    :param normalize: Whether to normalize the inputs to [0, 1].
     :param kernel_regularizer: The kernel regularizer to use.
     :param kernel_initializer: The kernel initializer to use.
     :param flatten: Whether to flatten the output or use a global average pooling layer.
@@ -473,6 +492,7 @@ def ResNet152(
         "large",
         output_units=output_units,
         include_top=include_top,
+        after_input=after_input,
         normalize=normalize,
         kernel_regularizer=kernel_regularizer,
         kernel_initializer=kernel_initializer,
