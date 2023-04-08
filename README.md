@@ -161,10 +161,11 @@ We used the following ResNet models:
 Each model is implemented as a function that follows this signature:
 
 ```py
-def ResNetN(
+def ResNet18(
     input_shape: Tuple[int, int, int],
     output_units=1000,
     include_top=True,
+    after_input: Union[Model, None] = None,
     normalize=False,
     kernel_regularizer: Union[Regularizer, None] = None,
     kernel_initializer="he_uniform",
@@ -177,11 +178,12 @@ where N in the function name is the number of layers in the model that should be
 
 - `input_shape` - Shape of the input images
 - `output_units` - Number of output units used in the last layer if `include_top` is `True` (default: `1000`)
-- `include_top` - Whether to include the network top (default: `True`)
+- `include_top` - Whether to include the network top after global average pooling or the flatten layer (default: `True`)
+- `after_input` -Custom layers to add after the input like preprocessing layers as a Keras model of class `tf.keras.Model` (default: `None` - no custom layers)
 - `normalize` - Whether to normalize the input images to the range [0, 1] (default: `False`)
 - `kernel_regularizer` - Kernel regularizer of class `tf.keras.regularizers.Regularizer` (default: `None`)
 - `kernel_initializer` - Kernel initializer (default: `he_uniform`)
-- `flatten` - Whether to flatten the output of the last convolutional layer or use global average pooling (default: `False` - use global average pooling)
+- `flatten` - Whether to use a flatten layer instead of a global average pooling layer after the last block (default: `False` - use global average pooling)
 - `dropout_rate` - Dropout rate used after global average pooling or flattening (default: `0.0`)
 
 Models use the [Functional API](https://www.tensorflow.org/guide/keras/functional) of Keras under the hood which defines the model's structure as a directed acyclic graph of layers. The function returns a `tf.keras.Model` instance that needs to be compiled and trained.
