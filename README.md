@@ -325,7 +325,7 @@ In the next attempt we used AdamW with a learning rate of 0.00001, weight decay 
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW](./graphs/resnet50_pretrained_adamw.png)
 
-As our last attempts with ResNets we decided to try the larger dataset with improved labels. We also kept the ImageNet weights frozen and used AdamW with the same hyperparameters. The batch size stayed at 64. We used the same top as before. Early stopping was used too with a patience of 10 epochs and best weights restoration. This training yielded the best results so far. The training ended by early stopping on epoch 80 where the training loss was 0.4867, the validation loss was 1.2748, the training accuracy was 0.8315, and the validation accuracy was 0.5926. The test accuracy was still very low though - only 0.3868. The training progress can be seen in the graph below.
+Next we decided to try the larger dataset with improved labels. We also kept the ImageNet weights frozen and used AdamW with the same hyperparameters. The batch size stayed at 64. We used the same top as before. Early stopping was used too with a patience of 10 epochs and best weights restoration. This training yielded the best results so far. The training ended by early stopping on epoch 80 where the training loss was 0.4867, the validation loss was 1.2748, the training accuracy was 0.8315, and the validation accuracy was 0.5926. The test accuracy was still very low though - only 0.3868. The training progress can be seen in the graph below.
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 3x Dataset](./graphs/resnet50_pretrained_adamw_3x.png)
 
