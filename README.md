@@ -3,6 +3,25 @@
 Course: Neural Networks @ FIIT STU\
 Authors: Viktor Modroczký & Michaela Hanková
 
+## Contents
+
+- [Dataset](#dataset)
+- [Preprocessing](#preprocessing)
+  - [Datasplit Script](#datasplit-script)
+  - [Running the Datasplit Script](#running-the-datasplit-script)
+  - [Relabeling Script](#relabeling-script)
+  - [Running the Relabeling Script](#running-the-relabeling-script)
+  - [How we ran the scripts](#how-we-ran-the-scripts)
+- [Models](#models)
+- [Training and Testing Environment](#training-and-testing-environment)
+- [Training](#training)
+  - [ResNet-18 Training](#resnet-18-training)
+  - [ResNet-18 with a changed top](#resnet-18-with-a-changed-top)
+  - [ResNet-34 with a changed top](#resnet-34-with-a-changed-top)
+  - [ResNet-50 from Tensorflow pretrained on ImageNet](#resnet-50-from-tensorflow-pretrained-on-imagenet)
+- [Conclusion](#conclusion)
+- [References](#references)
+
 ## Dataset
 
 We used the [Facial Expressions Training Data](https://www.kaggle.com/datasets/noamsegal/affectnet-training-data) from Kaggle. The dataset contains 29,042 images of 8 different classes of emotions which are not balanced - anger, contempt, disgust, fear, happy, neutral, sad, and surprise. The images are 96x96 pixels in size and have 3 channels (RGB).
@@ -94,7 +113,7 @@ The pipeline has to be an instance of [`albumentations.core.composition.Compose`
 
 Example of serializing a custom pipeline is included in the [`src`](./src) folder and is named [`custom_pipeline_example.py`](./src/custom_pipeline_example.py). Example of a serialized pipeline is included in the root folder and is named [`custom_pipeline_example.yml`](./custom_pipeline_example.yml).
 
-### Relabeling the Dataset
+### Relabeling Script
 
 The original dataset also has a `labels.csv` file which includes improved labels by machine learning. We decided to create a script that relabels the dataset using the improved labels. The script is available in the [`src/relabel.py`](./src/relabel.py) file.
 
@@ -148,7 +167,7 @@ The resulting dataset is split into training and test sets and is balanced. It c
 
 Both datasets are available on Kaggle as `data_relabeled_balanced_1x` and `data_relabeled_balanced_3x`: [Facial Affect Dataset Relabeled](https://www.kaggle.com/datasets/viktormodroczky/facial-affect-data-relabeled)
 
-## Model
+## Models
 
 We decided to implement each ResNet model in Tensorflow and choose the best performing model as our final model. The models are based on the [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) paper by Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun (2015). The models are implemented in the [`src/resnets.py`](./src/resnets.py) file.
 
@@ -246,7 +265,7 @@ After no success with the Adam optimizer we decided to try SGD again, this time 
 
 Another attempt was using SGD with Nesterov momentum at 0.9, learning rate of 0.001, and batch size of 64. This time we used L2 kernel regularization at 0.001. The training resulted in the same pattern as before.
 
-#### ResNet-18 with a changed top
+### ResNet-18 with a changed top
 
 We also tried to change the top of the ResNet-18 model by replacing the last `Dense` layer with a top similar to VGG16 as stated in [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) by Karen Simonyan and Andrew Zisserman (2015). Instead of a single `Dense` layer with 8 units we used 3 `Dense` layers with 4096, 4096, and 8 units respectively. We also added a `Dropout` layer with a rate of 0.5 after the first 2 `Dense` layers. Instead of a `GlobalAveragePooling2D` layer we used a `Flatten` layer before the first `Dense` layer. After the `Flatten` layer we used a `Dropout` layer with a rate of 0.2. The model was trained using the Adam optimizer with a learning rate of 0.00001, a batch size of 64, $\beta_1$ of 0.9, and $\beta_2$ of 0.999. We trained the model on the same data - balanced dataset with improved labels.
 
@@ -274,7 +293,7 @@ model = Model(inputs=model.input, outputs=top)
 
 The model started overfitting after 15 epochs. We ended the training after the 21st epoch on 0.6711 training loss and 1.9891 validation loss.
 
-#### ResNet-34 with a changed top
+### ResNet-34 with a changed top
 
 After the unsuccessful attempt with ResNet-18 we decided to try the same approach with ResNet-34 and the same balanced data with improved labels. We used the same VGG16-like top as with ResNet-18 and the same optimizer and hyperparameters - learning rate of 0.00001 and a batch size of 64. The model started heavily overfitting after 12 epochs so we see no improvement over previous attempts. The training loss started at 2.057 and ended at 4.132 before early stopping at epoch 22.
 
@@ -284,7 +303,7 @@ Another attempt was to use a different learning rate of 0.000001. Although the m
 
 The notebook for the last experiment in this series of attempts with ResNet-18 and ResNet-34 can be found in the [`src`](./src/) directory as [`resnet-34-affect-better-labels-balanced.ipynb`](./src/resnet-34-affect-better-labels-balanced.ipynb).
 
-#### ResNet-50 from Tensorflow pretrained on ImageNet
+### ResNet-50 from Tensorflow pretrained on ImageNet
 
 We decided to try using a ResNet-50 model pretrained on ImageNet that is available in the Tensorflow library. We used a similar top as the VGG16-like top we used with ResNet-18 and ResNet-34 but with less neurons, 2048 and 512 respectively. We also set a different dropout rate of 0.2 before the last `Dense` layer. Keras applications require the input to be preprocessed to match the ImageNet dataset. To do that Tensorflow provides a `preprocess_input` function that can be used to preprocess the input. The model was initialized like this:
 
