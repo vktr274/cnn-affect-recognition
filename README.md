@@ -120,7 +120,7 @@ The script was written only for this specific dataset having a CSV file that con
 
 ### How we ran the scripts
 
-We ran the datasplit script for the original dataset and relabeled dataset with and without balancing the classes.
+We ran the `relabel.py` script on the original dataset first. Then we ran the `datasplit.py` script on the original dataset and relabeled dataset with and without balancing the classes and augmenting the dataset.
 
 **The following commands were used to create the dataset wihout balancing the classes:**
 
