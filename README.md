@@ -106,15 +106,17 @@ It can be run following this pattern:
 
 Positional argument:
 
-- `path` - Path to a directory that includes a train directory with the images in subdirectories named after the labels, e.g. if `path` is `data`, then the images should be in `data/train/class1`, `data/train/class2`, etc.
+- `path` - Path to a directory that includes a CSV file with improved labels and a train directory with the images in subdirectories named after the labels, e.g. if `path` is `data`, then the images should be in `data/train/class1`, `data/train/class2`, etc., and the CSV file with improved labels should be in a CSV file in `data`
 
 Options:
 
-- `-h`, `--help` - show help message and exit
+- `-h`, `--help` - Show help message and exit
 
 - `--output-path OUTPUT_PATH` - Path to an output directory (required)
 
-- `--label-csv LABEL_CSV` - Path to a CSV file with improved labels (default: `labels.csv` - use labels from `labels.csv`)
+- `--label-csv LABEL_CSV` - Name of the CSV file with improved labels including file extension (default: `labels.csv` - use labels from `path/labels.csv`)
+
+The script was written only for this specific dataset having a CSV file that contains an index column, a `pth` column, and a `label` column. The `relFCs` column is ignored.
 
 ### How we ran the scripts
 
