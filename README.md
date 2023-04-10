@@ -19,6 +19,7 @@ Authors: Viktor Modroczký & Michaela Hanková
   - [Training a ResNet-18 with a changed top](#training-a-resnet-18-with-a-changed-top)
   - [Training a ResNet-34 with a changed top](#training-a-resnet-34-with-a-changed-top)
   - [Training a ResNet-50 from Tensorflow pretrained on ImageNet](#training-a-resnet-50-from-tensorflow-pretrained-on-imagenet)
+- [ResNet-18 with a Different Dataset](#resnet-18-with-a-different-dataset)
 - [Conclusion](#conclusion)
 - [References](#references)
 
