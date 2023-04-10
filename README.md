@@ -15,10 +15,10 @@ Authors: Viktor Modroczký & Michaela Hanková
 - [Models](#models)
 - [Training and Testing Environment](#training-and-testing-environment)
 - [Training](#training)
-  - [ResNet-18 Training](#resnet-18-training)
-  - [ResNet-18 with a changed top](#resnet-18-with-a-changed-top)
-  - [ResNet-34 with a changed top](#resnet-34-with-a-changed-top)
-  - [ResNet-50 from Tensorflow pretrained on ImageNet](#resnet-50-from-tensorflow-pretrained-on-imagenet)
+  - [Training a ResNet-18](#training-a-resnet-18)
+  - [Training a ResNet-18 with a changed top](#training-a-resnet-18-with-a-changed-top)
+  - [Training a ResNet-34 with a changed top](#training-a-resnet-34-with-a-changed-top)
+  - [Training a ResNet-50 from Tensorflow pretrained on ImageNet](#training-a-resnet-50-from-tensorflow-pretrained-on-imagenet)
 - [Conclusion](#conclusion)
 - [References](#references)
 
@@ -241,7 +241,7 @@ The report from training with the unbalanced dataset with improved labels and wi
 
 In both cases the ResNet-18 and ResNet-34 seem to perform the best even though every model struggled to learn anything. Only the training accuracy kept increasing while the validation accuracy reached a plateau over time. The smaller models reached this validation accuracy plateau earlier than the larger models. After reaching the plateau on ResNet-18 and ResNet-34 the models started to visibly overfit because of earlier plateauing. The larger models started overfitting too but it was not as visible on the Wandb validation loss graphs due to large validation loss at earlier epochs. After zooming in on the validation loss graphs we could see increasing validation loss on the larger models as well.
 
-### ResNet-18 Training
+### Training a ResNet-18
 
 After seeing the baseline results, we decided to continue using the smaller models not only because they performed relatively well, but also because they are the fastest to train considering our time constraints.
 
@@ -265,7 +265,7 @@ After no success with the Adam optimizer we decided to try SGD again, this time 
 
 Another attempt was using SGD with Nesterov momentum at 0.9, learning rate of 0.001, and batch size of 64. This time we used L2 kernel regularization at 0.001. The training resulted in the same pattern as before.
 
-### ResNet-18 with a changed top
+### Training a ResNet-18 with a changed top
 
 We also tried to change the top of the ResNet-18 model by replacing the last `Dense` layer with a top similar to VGG16 as stated in [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) by Karen Simonyan and Andrew Zisserman (2015). Instead of a single `Dense` layer with 8 units we used 3 `Dense` layers with 4096, 4096, and 8 units respectively. We also added a `Dropout` layer with a rate of 0.5 after the first 2 `Dense` layers. Instead of a `GlobalAveragePooling2D` layer we used a `Flatten` layer before the first `Dense` layer. After the `Flatten` layer we used a `Dropout` layer with a rate of 0.2. The model was trained using the Adam optimizer with a learning rate of 0.00001, a batch size of 64, $\beta_1$ of 0.9, and $\beta_2$ of 0.999. We trained the model on the same data - balanced dataset with improved labels.
 
@@ -293,7 +293,7 @@ model = Model(inputs=model.input, outputs=top)
 
 The model started overfitting after 15 epochs. We ended the training after the 21st epoch on 0.6711 training loss and 1.9891 validation loss.
 
-### ResNet-34 with a changed top
+### Training a ResNet-34 with a changed top
 
 After the unsuccessful attempt with ResNet-18 we decided to try the same approach with ResNet-34 and the same balanced data with improved labels. We used the same VGG16-like top as with ResNet-18 and the same optimizer and hyperparameters - learning rate of 0.00001 and a batch size of 64. The model started heavily overfitting after 12 epochs so we see no improvement over previous attempts. The training loss started at 2.057 and ended at 4.132 before early stopping at epoch 22.
 
@@ -303,7 +303,7 @@ Another attempt was to use a different learning rate of 0.000001. Although the m
 
 The notebook for the last experiment in this series of attempts with ResNet-18 and ResNet-34 can be found in the [`src`](./src/) directory as [`resnet-34-affect-better-labels-balanced.ipynb`](./src/resnet-34-affect-better-labels-balanced.ipynb).
 
-### ResNet-50 from Tensorflow pretrained on ImageNet
+### Training a ResNet-50 from Tensorflow pretrained on ImageNet
 
 We decided to try using a ResNet-50 model pretrained on ImageNet that is available in the Tensorflow library. We used a similar top as the VGG16-like top we used with ResNet-18 and ResNet-34 but with less neurons, 2048 and 512 respectively. We also set a different dropout rate of 0.2 before the last `Dense` layer. Keras applications require the input to be preprocessed to match the ImageNet dataset. To do that Tensorflow provides a `preprocess_input` function that can be used to preprocess the input. The model was initialized like this:
 
