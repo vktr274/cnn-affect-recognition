@@ -306,7 +306,7 @@ The notebook for the last experiment in this series of attempts with ResNet-18 a
 
 ### Training a ResNet-50 from Tensorflow pretrained on ImageNet
 
-We decided to try using a ResNet-50 model pretrained on ImageNet that is available in the Tensorflow library. We used a similar top as the VGG-like top we used with ResNet-18 and ResNet-34 but with less neurons, 2048 and 512 respectively. We also set a different dropout rate of 0.2 before the last `Dense` layer. Keras applications require the input to be preprocessed to match the ImageNet dataset. To do that Tensorflow provides a `preprocess_input` function that can be used to preprocess the input. The model was initialized like this:
+We decided to try using a ResNet-50 model pretrained on ImageNet that is available in the Tensorflow library. We used a similar top as the VGG-like top we used with ResNet-18 and ResNet-34 but with less neurons, 2048 and 512 respectively. We also set a different dropout rate of 0.2 before the last `Dense` layer. Keras applications require the input to be preprocessed to match the ImageNet dataset. To do that Tensorflow provides a [`preprocess_input`](https://www.tensorflow.org/api_docs/python/tf/keras/applications/resnet50/preprocess_input) function that can be used to preprocess the input. The model was initialized like this:
 
 ```py
 from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
