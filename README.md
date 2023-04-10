@@ -267,7 +267,7 @@ Another attempt was using SGD with Nesterov momentum at 0.9, learning rate of 0.
 
 ### Training a ResNet-18 with a changed top
 
-We also tried to change the top of the ResNet-18 model by replacing the last `Dense` layer with a top similar to VGG16 as stated in [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) by Karen Simonyan and Andrew Zisserman (2015). Instead of a single `Dense` layer with 8 units we used 3 `Dense` layers with 4096, 4096, and 8 units respectively. We also added a `Dropout` layer with a rate of 0.5 after the first 2 `Dense` layers. Instead of a `GlobalAveragePooling2D` layer we used a `Flatten` layer before the first `Dense` layer. After the `Flatten` layer we used a `Dropout` layer with a rate of 0.2. The model was trained using the Adam optimizer with a learning rate of 0.00001, a batch size of 64, $\beta_1$ of 0.9, and $\beta_2$ of 0.999. We trained the model on the same data - balanced dataset with improved labels.
+We also tried to change the top of the ResNet-18 model by replacing the last `Dense` layer with a top similar to VGG as stated in [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556.pdf) by Karen Simonyan and Andrew Zisserman (2015). Instead of a single `Dense` layer with 8 units we used 3 `Dense` layers with 4096, 4096, and 8 units respectively. We also added a `Dropout` layer with a rate of 0.5 after the first 2 `Dense` layers. Instead of a `GlobalAveragePooling2D` layer we used a `Flatten` layer before the first `Dense` layer. After the `Flatten` layer we used a `Dropout` layer with a rate of 0.2. The model was trained using the Adam optimizer with a learning rate of 0.00001, a batch size of 64, $\beta_1$ of 0.9, and $\beta_2$ of 0.999. We trained the model on the same data - balanced dataset with improved labels.
 
 The model was initialized like this:
 
@@ -295,7 +295,7 @@ The model started overfitting after 15 epochs. We ended the training after the 2
 
 ### Training a ResNet-34 with a changed top
 
-After the unsuccessful attempt with ResNet-18 we decided to try the same approach with ResNet-34 and the same balanced data with improved labels. We used the same VGG16-like top as with ResNet-18 and the same optimizer and hyperparameters - learning rate of 0.00001 and a batch size of 64. The model started heavily overfitting after 12 epochs so we see no improvement over previous attempts. The training loss started at 2.057 and ended at 4.132 before early stopping at epoch 22.
+After the unsuccessful attempt with ResNet-18 we decided to try the same approach with ResNet-34 and the same balanced data with improved labels. We used the same VGG-like top as with ResNet-18 and the same optimizer and hyperparameters - learning rate of 0.00001 and a batch size of 64. The model started heavily overfitting after 12 epochs so we see no improvement over previous attempts. The training loss started at 2.057 and ended at 4.132 before early stopping at epoch 22.
 
 Another attempt was to use a different learning rate of 0.000001. Although the model didn't overfit, around epoch 50 the training loss started to diverge from the validation loss so the validation loss on epoch 100 was 1.7835 and the training loss was 1.3926. In case of accuracy the training accuracy was 0.4806 and the validation accuracy was 0.3428. We found the accuracy progress particularly interesting because training accuracy almost had a linear increase which can be seen in the graph below.
 
@@ -305,7 +305,7 @@ The notebook for the last experiment in this series of attempts with ResNet-18 a
 
 ### Training a ResNet-50 from Tensorflow pretrained on ImageNet
 
-We decided to try using a ResNet-50 model pretrained on ImageNet that is available in the Tensorflow library. We used a similar top as the VGG16-like top we used with ResNet-18 and ResNet-34 but with less neurons, 2048 and 512 respectively. We also set a different dropout rate of 0.2 before the last `Dense` layer. Keras applications require the input to be preprocessed to match the ImageNet dataset. To do that Tensorflow provides a `preprocess_input` function that can be used to preprocess the input. The model was initialized like this:
+We decided to try using a ResNet-50 model pretrained on ImageNet that is available in the Tensorflow library. We used a similar top as the VGG-like top we used with ResNet-18 and ResNet-34 but with less neurons, 2048 and 512 respectively. We also set a different dropout rate of 0.2 before the last `Dense` layer. Keras applications require the input to be preprocessed to match the ImageNet dataset. To do that Tensorflow provides a `preprocess_input` function that can be used to preprocess the input. The model was initialized like this:
 
 ```py
 from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
@@ -350,7 +350,7 @@ Next we decided to try the larger dataset with improved labels. We also kept the
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 3x Dataset](./graphs/resnet50_pretrained_adamw_3x.png)
 
-Based on the last training the previously observed issues are likely to be caused by not enough data as recognizing face expressions is a very difficult task. We can use a `Sequential` model with preprocessing layers to create more image variations on the fly. We defined the following Sequential model:
+Based on the last training the previously observed issues are likely to be caused by not enough data or inconsistent labels even when using the improved labels. To create more variations of the data we can use a `Sequential` model with preprocessing layers to create more image variations on the fly. We defined the following Sequential model:
 
 ```py
 augmentation = Sequential([
@@ -371,9 +371,27 @@ Next we tried switching back to the smaller dataset with improved labels and the
 
 The notebook with the code for the last attempt with this model can be found in the [`src`](./src/) directory as [`resnet-50-imagenet-affect-better-labels-balanced.ipynb`](./src/resnet-50-imagenet-affect-better-labels-balanced.ipynb).
 
+The training report for every attempt with ResNet-18, ResNet-34, and pretrained ResNet-50 from Weights & Biases can be found [here](https://api.wandb.ai/links/nsiete23/b1vjqg8q).
+
+## ResNet-18 with a Different Dataset
+
+To see if the dataset is the problem we decided to try a different dataset. This way we can show that our ResNet-18 implementation is working well on a good dataset. The dataset we chose last minute is the [Face Mask 12k Dataset](https://www.kaggle.com/datasets/ashishjangra27/face-mask-12k-images-dataset) which only contains 2 classes - with mask and without mask - but we can show the model is learning and generalizing well unlike on our previous dataset. The dataset contains 5000 training images and 400 validation images in each class. The test set contains 483 images for the 'with mask' class and 509 images for the 'without mask' class. Images are RGB. We resised each image to 96x96 pixels during data loading with the `image_dataset_from_directory` function from `tf.keras.utils`.
+
+We used the Adam optimizer with a learning rate of 0.00001, $\beta_1$ of 0.9, and $\beta_2$ of 0.999. The batch size was 64. We used the same VGG-like top as with ResNet-18 ([Training a ResNet-18 with a changed top](#training-a-resnet-18-with-a-changed-top)) and we used dropout with a rate of 0.2 after the flatten layer. We configured early stopping with a patience of 10 epochs and best weights restoration.
+
+The training stopped by early stopping on epoch 19 with a training loss of 0.0023, a validation loss of 0.0716, a training accuracy of 0.9992, and a validation accuracy of 0.9875. The test accuracy was 0.9788. The best weights were restored on epoch 9 with a training loss of 0.0168, a validation loss of 0.0523, a training accuracy of 0.9930, and a validation accuracy of 0.9850. The test accuracy was 0.9788. The training progress can be seen in the graph below.
+
+![ResNet18 - Face Mask Dataset](./graphs/resnet18_face_masks.png)
+
+The confusion matrix for the test set can be seen below.
+
+![ResNet18 - Face Mask Dataset - Confusion Matrix](./graphs/resnet18_face_masks_matrix.png)
+
+The notebook with the code for this training can be found in the [`src`](./src/) directory as [`resnet-18-face-mask-detection.ipynb`](./src/resnet-18-face-mask-detection.ipynb).
+
 ## Conclusion
 
-Considering we tried multiple different models with different hyperparameters and different datasets, we can say that the dataset we used is not good enough to train a model that can recognize face expressions really well. The best results we achieved were with the ResNet50 model pretrained on ImageNet with the larger dataset with improved labels. In conclusion, the dataset would need to contain more images with more variations of the same expression or it would need to be preprocessed with different techniques, e.g. centering the face in the image, background removal, watermark removal, etc.
+Considering we tried multiple different models with different hyperparameters and different datasets, we can say that the dataset we used is not good enough to train a model that can recognize face expressions really well. The best results we achieved were with the ResNet50 model pretrained on ImageNet with the larger dataset with improved labels. In conclusion, the dataset would need to contain more images with more variations of the same expression or it would need to be preprocessed with different techniques, e.g. centering the face in the image, background removal, watermark removal, etc. Another option might be that the images are already well preprocessed and the labels are inconsistent. In that case, the labels would need to be improved.
 
 ## References
 
