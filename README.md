@@ -351,7 +351,7 @@ Next we decided to try the larger dataset with improved labels. We also kept the
 
 ![ResNet50 From Tensorflow Pretrained On ImageNet - AdamW - 3x Dataset](./graphs/resnet50_pretrained_adamw_3x.png)
 
-Based on the last training the previously observed issues are likely to be caused by not enough data or inconsistent labels even when using the improved labels. To create more variations of the data we can use a `Sequential` model with preprocessing layers to create more image variations on the fly. We defined the following Sequential model:
+Based on the last training the previously observed issues are likely to be caused by not enough data. To create more variations of the data we can use a `Sequential` model with preprocessing layers to create more image variations on the fly. We defined the following Sequential model:
 
 ```py
 augmentation = Sequential([
@@ -394,7 +394,7 @@ The notebook with the code for this training can be found in the [`src`](./src/)
 
 Considering we tried multiple different models with different hyperparameters and different dataset sizes, we can say that the dataset we used is not good enough to train a model that can recognize face expressions well. The best results we achieved were with the ResNet50 model pretrained on ImageNet with the larger dataset with improved labels.
 
-In conclusion, the dataset would need to contain more images with more variations of the same expression or it would need to be preprocessed with different techniques, e.g. centering the face in the image, background removal, watermark removal, etc. Another option might be that the images are already well preprocessed and the labels are inconsistent. In that case, the labels would need to be improved.
+In conclusion, the dataset would need to contain more images with more variations of the same expression or, in addition to that, it would need to be preprocessed with different techniques, e.g. background removal, watermark removal, etc. Another option might be that the images are already well preprocessed and the labels are inconsistent. In that case, the labels would need to be improved. After a glance at the labels, we didn't find any obvious mistakes. However, we didn't investigate the labels thoroughly.
 
 ## References
 
