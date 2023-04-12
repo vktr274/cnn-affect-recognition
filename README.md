@@ -316,7 +316,7 @@ x = preprocess_input(inputs)
 
 model = ResNet50(
     include_top=False,
-    weights='imagenet',
+    weights="imagenet",
     input_shape=(image_size, image_size, channels),
     pooling="avg"
 )
@@ -324,11 +324,11 @@ model.trainable = config["trainable"]
 
 outputs = model(x)
 
-top = Dense(2048, activation='relu')(outputs)
+top = Dense(2048, activation="relu")(outputs)
 top = Dropout(0.5)(top)
-top = Dense(512, activation='relu')(top)
+top = Dense(512, activation="relu")(top)
 top = Dropout(0.2)(top)
-top = Dense(len(classes), activation='softmax')(top)
+top = Dense(len(classes), activation="softmax")(top)
 
 model = Model(inputs=inputs, outputs=top)
 ```
