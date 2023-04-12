@@ -222,13 +222,13 @@ The text files are included in the root folder and are named [`resnet18.txt`](./
 
 ## Training and Testing Environment
 
-We used Kaggle notebooks for model training and testing on a GPU - a Tesla P100. Training complex model like ResNets on a CPU would take a very long time so we didn't prepare a Docker image for CPU training and testing.
+We used Kaggle notebooks for model training and testing on a GPU - a Tesla P100. Training complex models like ResNets on a CPU would take a very long time so we didn't prepare a Docker image for CPU training and testing.
 
 ## Training
 
 As a starting point we were inspired by Kaiming He et al. and their paper. They used SGD with a learning rate of 0.1 and a momentum of 0.9. They also used weight decay of 0.0001 and a batch size of 256. We decided to use all but the batch size, which we set to 32. We note that instead of weight decay we used a kernel regularizer with an L2 norm of 0.0001, which according to Ilya Loshchilov and Frank Hutter ([Fixing Weight Decay Regularization in Adam](https://arxiv.org/pdf/1711.05101v2.pdf), 2018) is equivalent to weight decay when paired with SGD.
 
-We also used a similar learning rate schedule as in the paper. Our scheduler was set to monitor validation loss and reduce the learning rate by a factor of 0.1 when the validation loss did not improve for 5 epochs. We also used early stopping with a patience of 10 epochs and best weights restoration.
+We also used a similar learning rate schedule as in the paper. Our scheduler was set to monitor validation loss and reduce the learning rate by a factor of 0.1 when the validation loss did not improve for 5 epochs. We also used early stopping with a patience of 10 epochs and best weights restoration. The loss function we used throughout all experiments was sparse categorical crossentropy.
 
 These hyperparameters were used for all ResNet models we implemented. As training data we used the unbalanced datasets first to get a baseline on how well the models perform. All models were trained on the imbalanced dataset with original labels and the imbalanced relabeled dataset so we could compare the effect of relabeling the dataset on the model performance.
 
