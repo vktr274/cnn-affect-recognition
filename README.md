@@ -29,6 +29,10 @@ We used the [Facial Expressions Training Data](https://www.kaggle.com/datasets/n
 
 ## Preprocessing
 
+Scripts for data preprocessing were written in Python 3.7. Both scripts require installation of Python packages listed in the [`requirements.txt`](./requirements.txt) file. The packages can be installed using the following command:
+
+`pip install -r requirements.txt`
+
 ### Datasplit Script
 
 We created a Python script that splits the dataset into training and test sets by random sampling from the original dataset and optionally balances the dataset by augmenting classes smaller in size relative to the largest class. If balancing is enabled, it can also optionally perform global augmentation. Meaning that the number of images in each class can be increased by a global multiplier. The script also creates a CSV file with label to filename mappings for the training and test sets.
@@ -78,10 +82,6 @@ your_dataset_folder
 The script will create a `test` subdirectory in the directory and will move part of the images from the `train` subdirectory to the `test` subdirectory. This means that the default behavior of the script is to overwrite the input directory. The script will also create a `train.csv` and `test.csv` files in the directory. The `train.csv` file will contain the label to filename mappings for the training set and the `test.csv` file will contain the label to filename mappings for the test set.
 
 If the script is ran with a specified output path, the script will first copy the images from the `train` subdirectory in the input directory to the `train` subdirectory in the output directory and will create the `test` subdirectory in the output directory. The `train.csv` and `test.csv` files will be created in the output directory. If the output directory does not exist, it will be created. If the output directory exists, it can only contain an empty `train` subdirectory or can be empty completely.
-
-Besides the dataset, the script requires installation of required Python packages listed in the [`requirements.txt`](./requirements.txt) file. The packages can be installed using the following command:
-
-`pip install -r requirements.txt`
 
 The script is universal and can be used for any dataset that has the same structure (dataset with a train subdirectory with images in subdirectories named after the labels).
 
@@ -170,7 +170,7 @@ Both datasets are available on Kaggle as `data_relabeled_balanced_1x` and `data_
 
 ## Models
 
-We decided to implement each ResNet model in Tensorflow and choose the best performing model as our final model. The models are based on the [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) paper by Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun (2015). The models are implemented in the [`src/resnets.py`](./src/resnets.py) file.
+We decided to implement each ResNet model in Tensorflow with Python 3.7 and choose the best performing model as our final model. The models are based on the [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) paper by Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun (2015). The models are implemented in the [`src/resnets.py`](./src/resnets.py) file. Requirements should be installed using the `requirements.txt` file.
 
 We used the following ResNet models:
 
@@ -222,7 +222,7 @@ The text files are included in the root folder and are named [`resnet18.txt`](./
 
 ## Training and Testing Environment
 
-We used Kaggle notebooks for model training and testing on a GPU - a Tesla P100. Training complex models like ResNets on a CPU would take a very long time so we didn't prepare a Docker image for CPU training and testing.
+We used Kaggle notebooks for model training and testing on a GPU - a Tesla P100. Training complex models like ResNets on a CPU would take a very long time so we didn't prepare a Docker image for CPU training and testing. Jupyter Notebooks for training and testing were written in Python 3.7. We note that Kaggle already has required packages installed and configured for GPU usage.
 
 ## Training
 
